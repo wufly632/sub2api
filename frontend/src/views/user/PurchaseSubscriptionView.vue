@@ -178,11 +178,11 @@
             <template #cell-actions="{ row }">
               <div class="flex items-center gap-2">
                 <button
-                  v-if="row.status === 'pending' && row.payment_url"
+                  v-if="row.status === 'pending' && (row.payment_qrcode || row.payment_url)"
                   class="btn btn-primary btn-sm"
-                  @click="openPayment(row.payment_url)"
+                  @click="openPaymentDialog(row)"
                 >
-                  {{ t('purchase.payNow') }}
+                  {{ t('purchase.viewQr') }}
                 </button>
                 <span v-else class="text-gray-400 dark:text-dark-500">-</span>
               </div>
@@ -201,16 +201,75 @@
         </div>
       </template>
     </div>
+
+    <BaseDialog
+      :show="paymentDialogVisible"
+      :title="t('purchase.qrTitle')"
+      width="narrow"
+      @close="closePaymentDialog"
+    >
+      <div v-if="paymentDialogOrder" class="space-y-4">
+        <div class="text-center text-sm text-gray-600 dark:text-dark-300">
+          <div class="text-xs text-gray-500 dark:text-dark-400">
+            {{ t('purchase.columns.orderNo') }}: {{ paymentDialogOrder.order_no }}
+          </div>
+          <div class="mt-2 flex items-center justify-center gap-2">
+            <span class="text-sm font-medium text-gray-600 dark:text-dark-300">
+              {{ t('purchase.columns.amount') }}:
+            </span>
+            <span class="rounded-md bg-emerald-50 px-2 py-0.5 text-base font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+              {{ paymentDialogOrder.currency }} {{ paymentDialogOrder.amount.toFixed(2) }}
+            </span>
+          </div>
+        </div>
+        <div class="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-dark-700 dark:bg-dark-800">
+          <img
+            v-if="paymentDialogQRCode"
+            :src="paymentDialogQRCode"
+            :alt="t('purchase.qrTitle')"
+            class="mx-auto h-48 w-48 rounded-md object-contain"
+          />
+          <div v-else class="text-sm text-gray-500 dark:text-dark-400">
+            {{ t('purchase.qrUnavailable') }}
+          </div>
+        </div>
+        <div class="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:bg-dark-900/40 dark:text-dark-200">
+          <span class="font-medium">{{ t('purchase.qrCountdown') }}</span>
+          <span class="font-mono text-base font-semibold text-gray-900 dark:text-white">
+            {{ paymentCountdownText }}
+          </span>
+        </div>
+        <div class="text-sm text-gray-600 dark:text-dark-300">
+          {{ t('purchase.qrTip') }}
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="btn btn-secondary" @click="closePaymentDialog">
+            {{ t('common.close') }}
+          </button>
+          <button
+            v-if="paymentDialogPaymentUrl"
+            class="btn btn-primary"
+            @click="openPayment(paymentDialogPaymentUrl)"
+          >
+            {{ t('purchase.openPaymentPage') }}
+          </button>
+        </div>
+      </template>
+    </BaseDialog>
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
 import { purchaseAPI } from '@/api'
 import type { Group, SubscriptionOrder } from '@/types'
 import type { Column } from '@/components/common/types'
@@ -228,6 +287,15 @@ const loadingOrders = ref(false)
 const plans = ref<Group[]>([])
 const orders = ref<SubscriptionOrder[]>([])
 const creatingOrderId = ref<number | null>(null)
+const paymentDialogVisible = ref(false)
+const paymentDialogOrder = ref<SubscriptionOrder | null>(null)
+const paymentCountdownSeconds = ref(0)
+let paymentCountdownTimer: ReturnType<typeof setInterval> | null = null
+let paymentPollingTimer: ReturnType<typeof setInterval> | null = null
+let paymentPollingInFlight = false
+let paymentPollingToken = 0
+let paymentAutoRefreshInFlight = false
+let paymentAutoRefreshDisabled = false
 
 const purchaseEnabled = computed(() => {
   return appStore.cachedPublicSettings?.purchase_subscription_enabled ?? false
@@ -244,6 +312,15 @@ const purchaseInstructions = computed(() => {
 const isValidUrl = computed(() => {
   const url = purchaseUrl.value
   return url.startsWith('http://') || url.startsWith('https://')
+})
+
+const paymentDialogQRCode = computed(() => paymentDialogOrder.value?.payment_qrcode || '')
+const paymentDialogPaymentUrl = computed(() => paymentDialogOrder.value?.payment_url || '')
+const paymentCountdownText = computed(() => {
+  const total = Math.max(0, paymentCountdownSeconds.value)
+  const minutes = Math.floor(total / 60)
+  const seconds = total % 60
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 })
 
 const orderPagination = reactive({
@@ -297,8 +374,10 @@ const handleCreateOrder = async (groupId: number) => {
       appStore.showSuccess(t('purchase.orderCreated'))
     } else {
       appStore.showSuccess(t('purchase.orderCreatedPending'))
-      if (order.payment_url) {
-        openPayment(order.payment_url)
+      if (order.payment_qrcode || order.payment_url) {
+        openPaymentDialog(order)
+      } else {
+        appStore.showError(t('purchase.paymentUnavailable'))
       }
     }
     await Promise.all([loadOrders(), loadPlans(), subscriptionStore.fetchActiveSubscriptions(true)])
@@ -312,6 +391,146 @@ const handleCreateOrder = async (groupId: number) => {
 const openPayment = (url: string) => {
   if (!url) return
   window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+const openPaymentDialog = (order: SubscriptionOrder) => {
+  paymentDialogOrder.value = order
+  paymentDialogVisible.value = true
+  startPaymentCountdown(order)
+  startPaymentPolling(order)
+}
+
+const closePaymentDialog = () => {
+  paymentDialogVisible.value = false
+  paymentDialogOrder.value = null
+  clearPaymentCountdown()
+  clearPaymentPolling()
+  paymentAutoRefreshDisabled = false
+}
+
+const startPaymentCountdown = (order: SubscriptionOrder) => {
+  clearPaymentCountdown()
+  paymentAutoRefreshDisabled = false
+  const expiresInSeconds = 5 * 60
+  const createdAt = order.created_at ? new Date(order.created_at).getTime() : Date.now()
+  const expiresAt = createdAt + expiresInSeconds * 1000
+
+  const updateCountdown = () => {
+    const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000))
+    paymentCountdownSeconds.value = remaining
+    if (remaining <= 0) {
+      if (
+        !paymentAutoRefreshDisabled &&
+        !paymentAutoRefreshInFlight &&
+        paymentDialogVisible.value &&
+        paymentDialogOrder.value?.status === 'pending'
+      ) {
+        void refreshPaymentOrder()
+      }
+    }
+  }
+
+  updateCountdown()
+  paymentCountdownTimer = setInterval(updateCountdown, 1000)
+}
+
+const clearPaymentCountdown = () => {
+  if (paymentCountdownTimer) {
+    clearInterval(paymentCountdownTimer)
+    paymentCountdownTimer = null
+  }
+  paymentCountdownSeconds.value = 0
+}
+
+const startPaymentPolling = (order: SubscriptionOrder) => {
+  clearPaymentPolling()
+  const poll = async () => {
+    if (!paymentDialogOrder.value || paymentPollingInFlight) return
+    const pollToken = paymentPollingToken
+    const currentOrderID = paymentDialogOrder.value.id
+    paymentPollingInFlight = true
+    try {
+      const latest = await purchaseAPI.getOrder(currentOrderID)
+      if (pollToken !== paymentPollingToken) {
+        return
+      }
+      if (!paymentDialogOrder.value || paymentDialogOrder.value.id !== latest.id) {
+        return
+      }
+      paymentDialogOrder.value = latest
+      updateOrderInList(latest)
+      if (latest.status !== 'pending') {
+        clearPaymentPolling()
+        if (latest.status === 'paid') {
+          appStore.showSuccess(t('purchase.paymentSuccess'))
+          await Promise.all([loadOrders(), subscriptionStore.fetchActiveSubscriptions(true)])
+          closePaymentDialog()
+        } else if (latest.status === 'canceled') {
+          appStore.showError(t('purchase.paymentCanceled'))
+          await loadOrders()
+        }
+      }
+    } catch (error: any) {
+      appStore.showError(error.response?.data?.detail || t('purchase.loadOrdersFailed'))
+    } finally {
+      paymentPollingInFlight = false
+    }
+  }
+  paymentDialogOrder.value = order
+  paymentPollingToken += 1
+  void poll()
+  paymentPollingTimer = setInterval(poll, 5000)
+}
+
+const clearPaymentPolling = () => {
+  if (paymentPollingTimer) {
+    clearInterval(paymentPollingTimer)
+    paymentPollingTimer = null
+  }
+  paymentPollingInFlight = false
+}
+
+const updateOrderInList = (order: SubscriptionOrder) => {
+  const index = orders.value.findIndex((item) => item.id === order.id)
+  if (index >= 0) {
+    orders.value.splice(index, 1, order)
+  }
+}
+
+const refreshPaymentOrder = async () => {
+  if (!paymentDialogOrder.value || paymentAutoRefreshInFlight) return
+  paymentAutoRefreshInFlight = true
+  appStore.showInfo(t('purchase.qrExpiredRefreshing'))
+  try {
+    const newOrder = await purchaseAPI.createOrder({ group_id: paymentDialogOrder.value.group_id })
+    updateOrderInList(newOrder)
+    await loadOrders()
+
+    if (newOrder.status === 'paid') {
+      appStore.showSuccess(t('purchase.paymentSuccess'))
+      await subscriptionStore.fetchActiveSubscriptions(true)
+      closePaymentDialog()
+      return
+    }
+
+    if (newOrder.payment_qrcode || newOrder.payment_url) {
+      paymentDialogOrder.value = newOrder
+      startPaymentCountdown(newOrder)
+      startPaymentPolling(newOrder)
+      appStore.showSuccess(t('purchase.qrRefreshed'))
+      return
+    }
+
+    paymentAutoRefreshDisabled = true
+    clearPaymentCountdown()
+    appStore.showError(t('purchase.paymentUnavailable'))
+  } catch (error: any) {
+    paymentAutoRefreshDisabled = true
+    clearPaymentCountdown()
+    appStore.showError(error.response?.data?.detail || t('purchase.qrRefreshFailed'))
+  } finally {
+    paymentAutoRefreshInFlight = false
+  }
 }
 
 const handleOrderPageChange = (page: number) => {
@@ -337,5 +556,10 @@ onMounted(async () => {
   if (purchaseEnabled.value) {
     await Promise.all([loadPlans(), loadOrders()])
   }
+})
+
+onUnmounted(() => {
+  clearPaymentCountdown()
+  clearPaymentPolling()
 })
 </script>

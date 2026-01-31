@@ -74,6 +74,7 @@ func provideCleanup(
 	tokenRefresh *service.TokenRefreshService,
 	accountExpiry *service.AccountExpiryService,
 	subscriptionExpiry *service.SubscriptionExpiryService,
+	subscriptionOrderExpiry *service.SubscriptionOrderExpiryService,
 	usageCleanup *service.UsageCleanupService,
 	idempotencyCleanup *service.IdempotencyCleanupService,
 	pricing *service.PricingService,
@@ -175,6 +176,10 @@ func provideCleanup(
 				if subscriptionService != nil {
 					subscriptionService.Stop()
 				}
+				return nil
+			}},
+			{"SubscriptionOrderExpiryService", func() error {
+				subscriptionOrderExpiry.Stop()
 				return nil
 			}},
 			{"PricingService", func() error {
