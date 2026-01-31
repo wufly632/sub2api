@@ -109,6 +109,10 @@ type CreateGroupInput struct {
 	DailyLimitUSD    *float64 // 日限额 (USD)
 	WeeklyLimitUSD   *float64 // 周限额 (USD)
 	MonthlyLimitUSD  *float64 // 月限额 (USD)
+	DefaultValidityDays int
+	PurchaseEnabled  bool
+	PurchasePrice    *float64
+	PurchaseDisplayOrder int
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	ImagePrice1K    *float64
 	ImagePrice2K    *float64
@@ -138,6 +142,10 @@ type UpdateGroupInput struct {
 	DailyLimitUSD    *float64 // 日限额 (USD)
 	WeeklyLimitUSD   *float64 // 周限额 (USD)
 	MonthlyLimitUSD  *float64 // 月限额 (USD)
+	DefaultValidityDays *int
+	PurchaseEnabled  *bool
+	PurchasePrice    *float64
+	PurchaseDisplayOrder *int
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	ImagePrice1K    *float64
 	ImagePrice2K    *float64
@@ -639,6 +647,13 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 	imagePrice2K := normalizePrice(input.ImagePrice2K)
 	imagePrice4K := normalizePrice(input.ImagePrice4K)
 
+	defaultValidityDays := normalizeValidityDaysInput(input.DefaultValidityDays)
+	purchasePrice := normalizePurchasePrice(input.PurchasePrice)
+	purchaseDisplayOrder := input.PurchaseDisplayOrder
+	if purchaseDisplayOrder < 0 {
+		purchaseDisplayOrder = 0
+	}
+
 	// 校验降级分组
 	if input.FallbackGroupID != nil {
 		if err := s.validateFallbackGroup(ctx, 0, *input.FallbackGroupID); err != nil {
@@ -694,6 +709,15 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		}
 	}
 
+	if input.PurchaseEnabled {
+		if subscriptionType != SubscriptionTypeSubscription {
+			return nil, fmt.Errorf("purchase plan must be subscription type")
+		}
+		if purchasePrice == nil {
+			return nil, fmt.Errorf("purchase price is required when enabled")
+		}
+	}
+
 	group := &Group{
 		Name:                            input.Name,
 		Description:                     input.Description,
@@ -705,6 +729,10 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		DailyLimitUSD:                   dailyLimit,
 		WeeklyLimitUSD:                  weeklyLimit,
 		MonthlyLimitUSD:                 monthlyLimit,
+		DefaultValidityDays:             defaultValidityDays,
+		PurchaseEnabled:                 input.PurchaseEnabled,
+		PurchasePrice:                   purchasePrice,
+		PurchaseDisplayOrder:            purchaseDisplayOrder,
 		ImagePrice1K:                    imagePrice1K,
 		ImagePrice2K:                    imagePrice2K,
 		ImagePrice4K:                    imagePrice4K,
@@ -744,6 +772,24 @@ func normalizePrice(price *float64) *float64 {
 		return nil
 	}
 	return price
+}
+
+// normalizePurchasePrice keeps 0 as free, negative clears.
+func normalizePurchasePrice(price *float64) *float64 {
+	if price == nil || *price < 0 {
+		return nil
+	}
+	return price
+}
+
+func normalizeValidityDaysInput(days int) int {
+	if days <= 0 {
+		days = 30
+	}
+	if days > MaxValidityDays {
+		days = MaxValidityDays
+	}
+	return days
 }
 
 // validateFallbackGroup 校验降级分组的有效性
@@ -854,6 +900,22 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	if input.MonthlyLimitUSD != nil {
 		group.MonthlyLimitUSD = normalizeLimit(input.MonthlyLimitUSD)
 	}
+	if input.DefaultValidityDays != nil {
+		group.DefaultValidityDays = normalizeValidityDaysInput(*input.DefaultValidityDays)
+	}
+	if input.PurchaseEnabled != nil {
+		group.PurchaseEnabled = *input.PurchaseEnabled
+	}
+	if input.PurchasePrice != nil {
+		group.PurchasePrice = normalizePurchasePrice(input.PurchasePrice)
+	}
+	if input.PurchaseDisplayOrder != nil {
+		if *input.PurchaseDisplayOrder < 0 {
+			group.PurchaseDisplayOrder = 0
+		} else {
+			group.PurchaseDisplayOrder = *input.PurchaseDisplayOrder
+		}
+	}
 	// 图片生成计费配置：负数表示清除（使用默认价格）
 	if input.ImagePrice1K != nil {
 		group.ImagePrice1K = normalizePrice(input.ImagePrice1K)
@@ -895,6 +957,15 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 		}
 	}
 	group.FallbackGroupIDOnInvalidRequest = fallbackOnInvalidRequest
+
+	if group.PurchaseEnabled {
+		if group.SubscriptionType != SubscriptionTypeSubscription {
+			return nil, fmt.Errorf("purchase plan must be subscription type")
+		}
+		if group.PurchasePrice == nil {
+			return nil, fmt.Errorf("purchase price is required when enabled")
+		}
+	}
 
 	// 模型路由配置
 	if input.ModelRouting != nil {

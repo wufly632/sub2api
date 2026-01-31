@@ -60,6 +60,12 @@ func RegisterAuthRoutes(
 		settings.GET("/public", h.Setting.GetPublicSettings)
 	}
 
+	// 支付回调（无需认证）
+	payment := v1.Group("/payment")
+	{
+		payment.POST("/xunhupay/notify", h.Payment.XunhuPayNotify)
+	}
+
 	// 需要认证的当前用户信息
 	authenticated := v1.Group("")
 	authenticated.Use(gin.HandlerFunc(jwtAuth))

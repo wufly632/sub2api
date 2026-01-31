@@ -88,6 +88,7 @@ export interface PublicSettings {
   hide_ccs_import_button: boolean
   purchase_subscription_enabled: boolean
   purchase_subscription_url: string
+  purchase_instructions: string
   linuxdo_oauth_enabled: boolean
   version: string
 }
@@ -352,6 +353,10 @@ export interface Group {
   daily_limit_usd: number | null
   weekly_limit_usd: number | null
   monthly_limit_usd: number | null
+  default_validity_days: number
+  purchase_enabled: boolean
+  purchase_price: number | null
+  purchase_display_order: number
   // 图片生成计费配置（仅 antigravity 平台使用）
   image_price_1k: number | null
   image_price_2k: number | null
@@ -427,6 +432,10 @@ export interface CreateGroupRequest {
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
   monthly_limit_usd?: number | null
+  default_validity_days?: number
+  purchase_enabled?: boolean
+  purchase_price?: number | null
+  purchase_display_order?: number
   image_price_1k?: number | null
   image_price_2k?: number | null
   image_price_4k?: number | null
@@ -450,6 +459,10 @@ export interface UpdateGroupRequest {
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
   monthly_limit_usd?: number | null
+  default_validity_days?: number
+  purchase_enabled?: boolean
+  purchase_price?: number | null
+  purchase_display_order?: number
   image_price_1k?: number | null
   image_price_2k?: number | null
   image_price_4k?: number | null
@@ -459,6 +472,37 @@ export interface UpdateGroupRequest {
   mcp_xml_inject?: boolean
   supported_model_scopes?: string[]
   copy_accounts_from_group_ids?: number[]
+}
+
+export type SubscriptionOrderStatus = 'pending' | 'paid' | 'canceled'
+
+export interface SubscriptionOrder {
+  id: number
+  order_no: string
+  user_id: number
+  group_id: number
+  subscription_id?: number | null
+  payment_provider: string
+  payment_url: string
+  payment_qrcode: string
+  payment_open_order_id: string
+  payment_transaction_id: string
+  payment_plugin: string
+  status: SubscriptionOrderStatus
+  amount: number
+  currency: string
+  validity_days: number
+  paid_at?: string | null
+  canceled_at?: string | null
+  notes: string
+  created_at: string
+  updated_at: string
+  group?: Group
+  subscription?: UserSubscription
+}
+
+export interface AdminSubscriptionOrder extends SubscriptionOrder {
+  user?: AdminUser
 }
 
 // ==================== Account & Proxy Types ====================

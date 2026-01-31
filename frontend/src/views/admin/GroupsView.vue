@@ -137,6 +137,21 @@
                   t('admin.groups.subscription.noLimit')
                 }}</span>
               </div>
+              <div
+                v-if="row.subscription_type === 'subscription'"
+                class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+              >
+                <template v-if="row.purchase_enabled">
+                  {{ t('admin.groups.subscription.purchaseLabel') }}
+                  <span class="font-medium text-gray-700 dark:text-gray-200">
+                    ￥{{ row.purchase_price ?? 0 }}
+                  </span>
+                  · {{ row.default_validity_days || 30 }}{{ t('admin.groups.subscription.days') }}
+                </template>
+                <template v-else>
+                  {{ t('admin.groups.subscription.purchaseDisabled') }}
+                </template>
+              </div>
             </div>
           </template>
 
@@ -388,6 +403,17 @@
             class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
           >
             <div>
+              <label class="input-label">{{ t('admin.groups.subscription.validityDays') }}</label>
+              <input
+                v-model.number="createForm.default_validity_days"
+                type="number"
+                step="1"
+                min="1"
+                class="input"
+                :placeholder="t('admin.groups.subscription.validityDaysPlaceholder')"
+              />
+            </div>
+            <div>
               <label class="input-label">{{ t('admin.groups.subscription.dailyLimit') }}</label>
               <input
                 v-model.number="createForm.daily_limit_usd"
@@ -419,6 +445,44 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
+            </div>
+
+            <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <label class="font-medium text-gray-900 dark:text-white">{{
+                    t('admin.groups.subscription.purchaseEnabled')
+                  }}</label>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ t('admin.groups.subscription.purchaseEnabledHint') }}
+                  </p>
+                </div>
+                <Toggle v-model="createForm.purchase_enabled" />
+              </div>
+            </div>
+
+            <div v-if="createForm.purchase_enabled" class="space-y-4">
+              <div>
+                <label class="input-label">{{ t('admin.groups.subscription.purchasePrice') }}</label>
+                <input
+                  v-model.number="createForm.purchase_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  class="input"
+                  :placeholder="t('admin.groups.subscription.purchasePricePlaceholder')"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{ t('admin.groups.subscription.purchaseDisplayOrder') }}</label>
+                <input
+                  v-model.number="createForm.purchase_display_order"
+                  type="number"
+                  step="1"
+                  min="0"
+                  class="input"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -1010,6 +1074,17 @@
             class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
           >
             <div>
+              <label class="input-label">{{ t('admin.groups.subscription.validityDays') }}</label>
+              <input
+                v-model.number="editForm.default_validity_days"
+                type="number"
+                step="1"
+                min="1"
+                class="input"
+                :placeholder="t('admin.groups.subscription.validityDaysPlaceholder')"
+              />
+            </div>
+            <div>
               <label class="input-label">{{ t('admin.groups.subscription.dailyLimit') }}</label>
               <input
                 v-model.number="editForm.daily_limit_usd"
@@ -1041,6 +1116,44 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
+            </div>
+
+            <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
+              <div class="flex items-center justify-between">
+                <div>
+                  <label class="font-medium text-gray-900 dark:text-white">{{
+                    t('admin.groups.subscription.purchaseEnabled')
+                  }}</label>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ t('admin.groups.subscription.purchaseEnabledHint') }}
+                  </p>
+                </div>
+                <Toggle v-model="editForm.purchase_enabled" />
+              </div>
+            </div>
+
+            <div v-if="editForm.purchase_enabled" class="space-y-4">
+              <div>
+                <label class="input-label">{{ t('admin.groups.subscription.purchasePrice') }}</label>
+                <input
+                  v-model.number="editForm.purchase_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  class="input"
+                  :placeholder="t('admin.groups.subscription.purchasePricePlaceholder')"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{ t('admin.groups.subscription.purchaseDisplayOrder') }}</label>
+                <input
+                  v-model.number="editForm.purchase_display_order"
+                  type="number"
+                  step="1"
+                  min="0"
+                  class="input"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -1474,6 +1587,7 @@ import BaseDialog from '@/components/common/BaseDialog.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Select from '@/components/common/Select.vue'
+import Toggle from '@/components/common/Toggle.vue'
 import PlatformIcon from '@/components/common/PlatformIcon.vue'
 import Icon from '@/components/icons/Icon.vue'
 
@@ -1654,6 +1768,10 @@ const createForm = reactive({
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
+  default_validity_days: 30,
+  purchase_enabled: false,
+  purchase_price: null as number | null,
+  purchase_display_order: 0,
   // 图片生成计费配置（仅 antigravity 平台使用）
   image_price_1k: null as number | null,
   image_price_2k: null as number | null,
@@ -1852,6 +1970,10 @@ const editForm = reactive({
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
+  default_validity_days: 30,
+  purchase_enabled: false,
+  purchase_price: null as number | null,
+  purchase_display_order: 0,
   // 图片生成计费配置（仅 antigravity 平台使用）
   image_price_1k: null as number | null,
   image_price_2k: null as number | null,
@@ -1944,6 +2066,10 @@ const closeCreateModal = () => {
   createForm.daily_limit_usd = null
   createForm.weekly_limit_usd = null
   createForm.monthly_limit_usd = null
+  createForm.default_validity_days = 30
+  createForm.purchase_enabled = false
+  createForm.purchase_price = null
+  createForm.purchase_display_order = 0
   createForm.image_price_1k = null
   createForm.image_price_2k = null
   createForm.image_price_4k = null
@@ -1997,6 +2123,10 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.daily_limit_usd = group.daily_limit_usd
   editForm.weekly_limit_usd = group.weekly_limit_usd
   editForm.monthly_limit_usd = group.monthly_limit_usd
+  editForm.default_validity_days = group.default_validity_days || 30
+  editForm.purchase_enabled = group.purchase_enabled || false
+  editForm.purchase_price = group.purchase_price ?? null
+  editForm.purchase_display_order = group.purchase_display_order ?? 0
   editForm.image_price_1k = group.image_price_1k
   editForm.image_price_2k = group.image_price_2k
   editForm.image_price_4k = group.image_price_4k
@@ -2077,6 +2207,9 @@ watch(
     if (newVal === 'subscription') {
       createForm.is_exclusive = true
       createForm.fallback_group_id_on_invalid_request = null
+    } else {
+      createForm.purchase_enabled = false
+      createForm.purchase_price = null
     }
   }
 )

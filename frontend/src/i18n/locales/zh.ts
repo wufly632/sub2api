@@ -193,6 +193,7 @@ export default {
     users: '用户管理',
     groups: '分组管理',
     subscriptions: '订阅管理',
+    orders: '订单管理',
     accounts: '账号管理',
     proxies: 'IP管理',
     redeemCodes: '兑换码',
@@ -1134,6 +1135,16 @@ export default {
         monthlyLimit: '每月限额（USD）',
         defaultValidityDays: '默认有效期（天）',
         validityHint: '分配给用户时订阅的有效天数',
+        validityDays: '有效期（天）',
+        validityDaysPlaceholder: '例如 30',
+        purchaseEnabled: '开启购买',
+        purchaseEnabledHint: '在购买页展示该套餐',
+        purchasePrice: '购买价格',
+        purchasePricePlaceholder: '例如 99',
+        purchaseDisplayOrder: '展示顺序',
+        purchaseLabel: '价格',
+        purchaseDisabled: '未开启购买',
+        days: '天',
         noLimit: '无限制'
       },
       imagePricing: {
@@ -1269,6 +1280,43 @@ export default {
       pleaseSelectGroup: '请选择分组',
       validityDaysRequired: '请输入有效的天数（至少1天）',
       revokeConfirm: "确定要撤销 '{user}' 的订阅吗？此操作无法撤销。"
+    },
+
+    // Orders
+    orders: {
+      title: '订单管理',
+      description: '管理订阅购买订单',
+      allStatus: '全部状态',
+      searchOrderNo: '搜索订单号',
+      filterUserId: '用户 ID',
+      filterGroupId: '分组 ID',
+      markPaid: '标记已支付',
+      cancel: '取消订单',
+      days: '天',
+      loadFailed: '加载订单失败',
+      actionFailed: '操作失败',
+      markPaidSuccess: '订单已标记为已支付',
+      cancelSuccess: '订单已取消',
+      confirmPaidTitle: '确认收款',
+      confirmPaidMessage: '确认将订单 {orderNo} 标记为已支付？',
+      confirmCancelTitle: '确认取消',
+      confirmCancelMessage: '确认取消订单 {orderNo}？',
+      status: {
+        pending: '待支付',
+        paid: '已支付',
+        canceled: '已取消'
+      },
+      columns: {
+        orderNo: '订单号',
+        user: '用户',
+        group: '套餐',
+        amount: '金额',
+        validity: '有效期',
+        status: '状态',
+        createdAt: '创建时间',
+        paidAt: '支付时间',
+        actions: '操作'
+      }
     },
 
     // Accounts Management
@@ -3304,7 +3352,33 @@ export default {
         urlPlaceholder: 'https://example.com/purchase',
         urlHint: '必须是完整的 http(s) 链接',
         iframeWarning:
-          '⚠️ iframe 提示：部分网站会通过 X-Frame-Options 或 CSP（frame-ancestors）禁止被 iframe 嵌入，出现空白时可引导用户使用“新窗口打开”。'
+          '⚠️ iframe 提示：部分网站会通过 X-Frame-Options 或 CSP（frame-ancestors）禁止被 iframe 嵌入，出现空白时可引导用户使用“新窗口打开”。',
+        instructions: '购买说明',
+        instructionsPlaceholder: '填写付款方式、备注要求等说明',
+        instructionsHint: '展示在购买页面，支持 HTML 内容。'
+      },
+      payment: {
+        title: '在线支付设置',
+        description: '配置订阅订单的在线支付渠道',
+        provider: '支付方式',
+        providerManual: '线下手动',
+        providerXunhu: '虎皮椒',
+        xunhuAppId: '虎皮椒 AppID',
+        xunhuAppIdPlaceholder: '填写 AppID',
+        xunhuAppSecret: '虎皮椒 AppSecret',
+        secretPlaceholder: '填写 AppSecret',
+        secretConfigured: '********（已配置）',
+        secretHint: '留空保持现有密钥',
+        xunhuGateway: '支付网关地址',
+        xunhuGatewayPlaceholder: 'https://api.xunhupay.com/payment/do.html',
+        xunhuNotifyUrl: '回调地址（notify_url）',
+        xunhuNotifyUrlPlaceholder: 'https://your-domain.com/api/v1/payment/xunhupay/notify',
+        notifyHint: '需公网可访问（可用内网穿透），用于支付回调',
+        xunhuReturnUrl: '跳转地址（return_url）',
+        xunhuReturnUrlPlaceholder: 'https://your-domain.com/purchase',
+        xunhuPlugins: '支付渠道（plugins）',
+        xunhuPluginsPlaceholder: 'wechat,alipay（可选）',
+        pluginsHint: '留空由虎皮椒默认选择'
       },
       smtp: {
         title: 'SMTP 设置',
@@ -3527,12 +3601,43 @@ export default {
   // Purchase Subscription Page
   purchase: {
     title: '购买订阅',
-    description: '通过内嵌页面完成订阅购买',
+    description: '选择套餐并下单，完成支付后订阅将开通。',
     openInNewTab: '新窗口打开',
     notEnabledTitle: '该功能未开启',
     notEnabledDesc: '管理员暂未开启购买订阅入口，请联系管理员。',
     notConfiguredTitle: '购买链接未配置',
-    notConfiguredDesc: '管理员已开启入口，但尚未配置购买订阅链接，请联系管理员。'
+    notConfiguredDesc: '管理员已开启入口，但尚未配置购买订阅链接，请联系管理员。',
+    plans: '可购买套餐',
+    orders: '我的订单',
+    noPlans: '暂无可购买套餐',
+    noOrders: '暂无订单',
+    createOrder: '创建订单',
+    creating: '正在创建...',
+    loadPlansFailed: '加载套餐失败',
+    loadOrdersFailed: '加载订单失败',
+    createOrderFailed: '创建订单失败',
+    orderCreated: '订单已创建，订阅已开通。',
+    orderCreatedPending: '订单已创建，请完成支付。',
+    dailyLimit: '日限额',
+    weeklyLimit: '周限额',
+    monthlyLimit: '月限额',
+    unlimited: '无限制',
+    days: '天',
+    subscription: '订阅',
+    columns: {
+      orderNo: '订单号',
+      plan: '套餐',
+      amount: '金额',
+      status: '状态',
+      createdAt: '创建时间',
+      actions: '操作'
+    },
+    payNow: '立即支付',
+    orderStatus: {
+      pending: '待支付',
+      paid: '已支付',
+      canceled: '已取消'
+    }
   },
 
   // Announcements Page

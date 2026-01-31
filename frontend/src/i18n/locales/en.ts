@@ -196,6 +196,7 @@ export default {
     users: 'Users',
     groups: 'Groups',
     subscriptions: 'Subscriptions',
+    orders: 'Orders',
     accounts: 'Accounts',
     proxies: 'Proxies',
     redeemCodes: 'Redeem Codes',
@@ -1050,6 +1051,16 @@ export default {
         monthlyLimit: 'Monthly Limit (USD)',
         defaultValidityDays: 'Default Validity (Days)',
         validityHint: 'Number of days the subscription is valid when assigned to a user',
+        validityDays: 'Validity (Days)',
+        validityDaysPlaceholder: 'e.g., 30',
+        purchaseEnabled: 'Enable Purchase',
+        purchaseEnabledHint: 'Show this plan on the purchase page',
+        purchasePrice: 'Purchase Price',
+        purchasePricePlaceholder: 'e.g., 99',
+        purchaseDisplayOrder: 'Display Order',
+        purchaseLabel: 'Price',
+        purchaseDisabled: 'Purchase disabled',
+        days: 'days',
         noLimit: 'No limit'
       },
       imagePricing: {
@@ -1184,6 +1195,43 @@ export default {
       validityDaysRequired: 'Please enter a valid number of days (at least 1)',
       revokeConfirm:
         "Are you sure you want to revoke the subscription for '{user}'? This action cannot be undone."
+    },
+
+    // Orders
+    orders: {
+      title: 'Order Management',
+      description: 'Manage subscription purchase orders',
+      allStatus: 'All Status',
+      searchOrderNo: 'Search order number',
+      filterUserId: 'User ID',
+      filterGroupId: 'Group ID',
+      markPaid: 'Mark Paid',
+      cancel: 'Cancel',
+      days: 'days',
+      loadFailed: 'Failed to load orders',
+      actionFailed: 'Action failed',
+      markPaidSuccess: 'Order marked as paid',
+      cancelSuccess: 'Order canceled',
+      confirmPaidTitle: 'Confirm Payment',
+      confirmPaidMessage: 'Mark order {orderNo} as paid?',
+      confirmCancelTitle: 'Confirm Cancel',
+      confirmCancelMessage: 'Cancel order {orderNo}?',
+      status: {
+        pending: 'Pending',
+        paid: 'Paid',
+        canceled: 'Canceled'
+      },
+      columns: {
+        orderNo: 'Order No.',
+        user: 'User',
+        group: 'Plan',
+        amount: 'Amount',
+        validity: 'Validity',
+        status: 'Status',
+        createdAt: 'Created At',
+        paidAt: 'Paid At',
+        actions: 'Actions'
+      }
     },
 
     // Accounts
@@ -3132,7 +3180,33 @@ export default {
         urlPlaceholder: 'https://example.com/purchase',
         urlHint: 'Must be an absolute http(s) URL',
         iframeWarning:
-          '⚠️ iframe note: Some websites block embedding via X-Frame-Options or CSP (frame-ancestors). If the page is blank, provide an "Open in new tab" alternative.'
+          '⚠️ iframe note: Some websites block embedding via X-Frame-Options or CSP (frame-ancestors). If the page is blank, provide an "Open in new tab" alternative.',
+        instructions: 'Purchase Instructions',
+        instructionsPlaceholder: 'Explain how to complete payment and any required notes',
+        instructionsHint: 'Displayed on the purchase page. Supports HTML content.'
+      },
+      payment: {
+        title: 'Payment Settings',
+        description: 'Configure online payment provider for subscription orders',
+        provider: 'Payment Provider',
+        providerManual: 'Manual (offline)',
+        providerXunhu: 'XunhuPay',
+        xunhuAppId: 'XunhuPay App ID',
+        xunhuAppIdPlaceholder: 'Your App ID',
+        xunhuAppSecret: 'XunhuPay App Secret',
+        secretPlaceholder: 'Your App Secret',
+        secretConfigured: '******** (configured)',
+        secretHint: 'Leave empty to keep existing secret',
+        xunhuGateway: 'Payment Gateway URL',
+        xunhuGatewayPlaceholder: 'https://api.xunhupay.com/payment/do.html',
+        xunhuNotifyUrl: 'Notify URL',
+        xunhuNotifyUrlPlaceholder: 'https://your-domain.com/api/v1/payment/xunhupay/notify',
+        notifyHint: 'Must be publicly accessible (use a tunnel if local) for payment callbacks',
+        xunhuReturnUrl: 'Return URL',
+        xunhuReturnUrlPlaceholder: 'https://your-domain.com/purchase',
+        xunhuPlugins: 'Payment Channel (plugins)',
+        xunhuPluginsPlaceholder: 'wechat,alipay (optional)',
+        pluginsHint: 'Leave empty to allow default channel'
       },
       smtp: {
         title: 'SMTP Settings',
@@ -3356,13 +3430,44 @@ export default {
   // Purchase Subscription Page
   purchase: {
     title: 'Purchase Subscription',
-    description: 'Purchase a subscription via the embedded page',
+    description: 'Choose a plan, place an order, and complete payment to activate your subscription.',
     openInNewTab: 'Open in new tab',
-    notEnabledTitle: 'Feature not enabled',
+    notEnabledTitle: 'Purchase Not Available',
     notEnabledDesc: 'The administrator has not enabled the purchase page. Please contact admin.',
     notConfiguredTitle: 'Purchase URL not configured',
     notConfiguredDesc:
-      'The administrator enabled the entry but has not configured a purchase URL. Please contact admin.'
+      'The administrator enabled the entry but has not configured a purchase URL. Please contact admin.',
+    plans: 'Available Plans',
+    orders: 'My Orders',
+    noPlans: 'No purchasable plans available.',
+    noOrders: 'No orders yet.',
+    createOrder: 'Create Order',
+    creating: 'Creating...',
+    loadPlansFailed: 'Failed to load plans',
+    loadOrdersFailed: 'Failed to load orders',
+    createOrderFailed: 'Failed to create order',
+    orderCreated: 'Order created. Your subscription is now active.',
+    orderCreatedPending: 'Order created. Please complete payment.',
+    dailyLimit: 'Daily limit',
+    weeklyLimit: 'Weekly limit',
+    monthlyLimit: 'Monthly limit',
+    unlimited: 'Unlimited',
+    days: 'days',
+    subscription: 'Subscription',
+    columns: {
+      orderNo: 'Order No.',
+      plan: 'Plan',
+      amount: 'Amount',
+      status: 'Status',
+      createdAt: 'Created At',
+      actions: 'Actions'
+    },
+    payNow: 'Pay Now',
+    orderStatus: {
+      pending: 'Pending',
+      paid: 'Paid',
+      canceled: 'Canceled'
+    }
   },
 
   // Announcements Page

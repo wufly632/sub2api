@@ -67,6 +67,24 @@ const (
 	SubscriptionStatusSuspended = domain.SubscriptionStatusSuspended
 )
 
+// Subscription order status constants
+const (
+	OrderStatusPending  = "pending"
+	OrderStatusPaid     = "paid"
+	OrderStatusCanceled = "canceled"
+)
+
+// Payment provider constants
+const (
+	PaymentProviderManual   = "manual"
+	PaymentProviderXunhuPay = "xunhupay"
+)
+
+// Currency constants
+const (
+	CurrencyCNY = "CNY"
+)
+
 // LinuxDoConnectSyntheticEmailDomain 是 LinuxDo Connect 用户的合成邮箱后缀（RFC 保留域名）。
 const LinuxDoConnectSyntheticEmailDomain = "@linuxdo-connect.invalid"
 
@@ -113,6 +131,14 @@ const (
 	SettingKeyHideCcsImportButton         = "hide_ccs_import_button"        // 是否隐藏 API Keys 页面的导入 CCS 按钮
 	SettingKeyPurchaseSubscriptionEnabled = "purchase_subscription_enabled" // 是否展示“购买订阅”页面入口
 	SettingKeyPurchaseSubscriptionURL     = "purchase_subscription_url"     // “购买订阅”页面 URL（作为 iframe src）
+	SettingKeyPurchaseInstructions         = "purchase_instructions"         // 购买订阅页面说明（支持 Markdown/HTML）
+	SettingKeyPaymentProvider              = "payment_provider"              // 支付渠道（manual/xunhupay）
+	SettingKeyXunhuPayAppID                = "xunhupay_appid"
+	SettingKeyXunhuPayAppSecret            = "xunhupay_appsecret"
+	SettingKeyXunhuPayGateway              = "xunhupay_gateway"
+	SettingKeyXunhuPayNotifyURL            = "xunhupay_notify_url"
+	SettingKeyXunhuPayReturnURL            = "xunhupay_return_url"
+	SettingKeyXunhuPayPlugins              = "xunhupay_plugins"
 
 	// 默认配置
 	SettingKeyDefaultConcurrency = "default_concurrency" // 新用户默认并发量

@@ -48,6 +48,9 @@ func (r *groupRepository) Create(ctx context.Context, groupIn *service.Group) er
 		SetNillableImagePrice2k(groupIn.ImagePrice2K).
 		SetNillableImagePrice4k(groupIn.ImagePrice4K).
 		SetDefaultValidityDays(groupIn.DefaultValidityDays).
+		SetPurchaseEnabled(groupIn.PurchaseEnabled).
+		SetNillablePurchasePrice(groupIn.PurchasePrice).
+		SetPurchaseDisplayOrder(groupIn.PurchaseDisplayOrder).
 		SetClaudeCodeOnly(groupIn.ClaudeCodeOnly).
 		SetNillableFallbackGroupID(groupIn.FallbackGroupID).
 		SetNillableFallbackGroupIDOnInvalidRequest(groupIn.FallbackGroupIDOnInvalidRequest).
@@ -111,6 +114,9 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetNillableImagePrice2k(groupIn.ImagePrice2K).
 		SetNillableImagePrice4k(groupIn.ImagePrice4K).
 		SetDefaultValidityDays(groupIn.DefaultValidityDays).
+		SetPurchaseEnabled(groupIn.PurchaseEnabled).
+		SetNillablePurchasePrice(groupIn.PurchasePrice).
+		SetPurchaseDisplayOrder(groupIn.PurchaseDisplayOrder).
 		SetClaudeCodeOnly(groupIn.ClaudeCodeOnly).
 		SetModelRoutingEnabled(groupIn.ModelRoutingEnabled).
 		SetMcpXMLInject(groupIn.MCPXMLInject)
@@ -239,6 +245,30 @@ func (r *groupRepository) ListActive(ctx context.Context) ([]service.Group, erro
 		}
 	}
 
+	return outGroups, nil
+}
+
+func (r *groupRepository) ListPurchasePlans(ctx context.Context) ([]service.Group, error) {
+	groups, err := r.client.Group.Query().
+		Where(
+			group.StatusEQ(service.StatusActive),
+			group.SubscriptionTypeEQ(service.SubscriptionTypeSubscription),
+			group.PurchaseEnabledEQ(true),
+			group.PurchasePriceNotNil(),
+		).
+		Order(
+			dbent.Asc(group.FieldPurchaseDisplayOrder),
+			dbent.Asc(group.FieldID),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	outGroups := make([]service.Group, 0, len(groups))
+	for i := range groups {
+		outGroups = append(outGroups, *groupEntityToService(groups[i]))
+	}
 	return outGroups, nil
 }
 

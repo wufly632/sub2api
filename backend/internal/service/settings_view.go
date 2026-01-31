@@ -39,6 +39,15 @@ type SystemSettings struct {
 	HideCcsImportButton         bool
 	PurchaseSubscriptionEnabled bool
 	PurchaseSubscriptionURL     string
+	PurchaseInstructions        string
+	PaymentProvider             string
+	XunhuPayAppID               string
+	XunhuPayAppSecret           string
+	XunhuPayAppSecretConfigured bool
+	XunhuPayGateway             string
+	XunhuPayNotifyURL           string
+	XunhuPayReturnURL           string
+	XunhuPayPlugins             string
 
 	DefaultConcurrency int
 	DefaultBalance     float64
@@ -81,7 +90,7 @@ type PublicSettings struct {
 
 	PurchaseSubscriptionEnabled bool
 	PurchaseSubscriptionURL     string
-
+	PurchaseInstructions        string
 	LinuxDoOAuthEnabled bool
 	Version             string
 }

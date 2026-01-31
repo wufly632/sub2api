@@ -62,6 +62,9 @@ func RegisterAdminRoutes(
 		// 订阅管理
 		registerSubscriptionRoutes(admin, h)
 
+		// 订单管理
+		registerOrderRoutes(admin, h)
+
 		// 使用记录管理
 		registerUsageRoutes(admin, h)
 
@@ -294,6 +297,16 @@ func registerProxyRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		proxies.GET("/:id/accounts", h.Admin.Proxy.GetProxyAccounts)
 		proxies.POST("/batch-delete", h.Admin.Proxy.BatchDelete)
 		proxies.POST("/batch", h.Admin.Proxy.BatchCreate)
+	}
+}
+
+func registerOrderRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
+	orders := admin.Group("/orders")
+	{
+		orders.GET("", h.Admin.Order.List)
+		orders.GET("/:id", h.Admin.Order.GetByID)
+		orders.POST("/:id/mark-paid", h.Admin.Order.MarkPaid)
+		orders.POST("/:id/cancel", h.Admin.Order.Cancel)
 	}
 }
 

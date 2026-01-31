@@ -76,6 +76,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SettingKeyHideCcsImportButton,
 		SettingKeyPurchaseSubscriptionEnabled,
 		SettingKeyPurchaseSubscriptionURL,
+		SettingKeyPurchaseInstructions,
 		SettingKeyLinuxDoConnectEnabled,
 	}
 
@@ -114,6 +115,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		HideCcsImportButton:         settings[SettingKeyHideCcsImportButton] == "true",
 		PurchaseSubscriptionEnabled: settings[SettingKeyPurchaseSubscriptionEnabled] == "true",
 		PurchaseSubscriptionURL:     strings.TrimSpace(settings[SettingKeyPurchaseSubscriptionURL]),
+		PurchaseInstructions:        settings[SettingKeyPurchaseInstructions],
 		LinuxDoOAuthEnabled:         linuxDoEnabled,
 	}, nil
 }
@@ -157,6 +159,7 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		HideCcsImportButton         bool   `json:"hide_ccs_import_button"`
 		PurchaseSubscriptionEnabled bool   `json:"purchase_subscription_enabled"`
 		PurchaseSubscriptionURL     string `json:"purchase_subscription_url,omitempty"`
+		PurchaseInstructions        string `json:"purchase_instructions,omitempty"`
 		LinuxDoOAuthEnabled         bool   `json:"linuxdo_oauth_enabled"`
 		Version                     string `json:"version,omitempty"`
 	}{
@@ -178,6 +181,7 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		HideCcsImportButton:         settings.HideCcsImportButton,
 		PurchaseSubscriptionEnabled: settings.PurchaseSubscriptionEnabled,
 		PurchaseSubscriptionURL:     settings.PurchaseSubscriptionURL,
+		PurchaseInstructions:        settings.PurchaseInstructions,
 		LinuxDoOAuthEnabled:         settings.LinuxDoOAuthEnabled,
 		Version:                     s.version,
 	}, nil
@@ -232,6 +236,16 @@ func (s *SettingService) UpdateSettings(ctx context.Context, settings *SystemSet
 	updates[SettingKeyHideCcsImportButton] = strconv.FormatBool(settings.HideCcsImportButton)
 	updates[SettingKeyPurchaseSubscriptionEnabled] = strconv.FormatBool(settings.PurchaseSubscriptionEnabled)
 	updates[SettingKeyPurchaseSubscriptionURL] = strings.TrimSpace(settings.PurchaseSubscriptionURL)
+	updates[SettingKeyPurchaseInstructions] = settings.PurchaseInstructions
+	updates[SettingKeyPaymentProvider] = strings.TrimSpace(settings.PaymentProvider)
+	updates[SettingKeyXunhuPayAppID] = strings.TrimSpace(settings.XunhuPayAppID)
+	if settings.XunhuPayAppSecret != "" {
+		updates[SettingKeyXunhuPayAppSecret] = settings.XunhuPayAppSecret
+	}
+	updates[SettingKeyXunhuPayGateway] = strings.TrimSpace(settings.XunhuPayGateway)
+	updates[SettingKeyXunhuPayNotifyURL] = strings.TrimSpace(settings.XunhuPayNotifyURL)
+	updates[SettingKeyXunhuPayReturnURL] = strings.TrimSpace(settings.XunhuPayReturnURL)
+	updates[SettingKeyXunhuPayPlugins] = strings.TrimSpace(settings.XunhuPayPlugins)
 
 	// 默认配置
 	updates[SettingKeyDefaultConcurrency] = strconv.Itoa(settings.DefaultConcurrency)
@@ -383,6 +397,12 @@ func (s *SettingService) InitializeDefaultSettings(ctx context.Context) error {
 		SettingKeySiteLogo:                    "",
 		SettingKeyPurchaseSubscriptionEnabled: "false",
 		SettingKeyPurchaseSubscriptionURL:     "",
+		SettingKeyPurchaseInstructions:        "",
+		SettingKeyPaymentProvider:             PaymentProviderManual,
+		SettingKeyXunhuPayGateway:             "https://api.xunhupay.com/payment/do.html",
+		SettingKeyXunhuPayNotifyURL:           "",
+		SettingKeyXunhuPayReturnURL:           "",
+		SettingKeyXunhuPayPlugins:             "",
 		SettingKeyDefaultConcurrency:          strconv.Itoa(s.cfg.Default.UserConcurrency),
 		SettingKeyDefaultBalance:              strconv.FormatFloat(s.cfg.Default.UserBalance, 'f', 8, 64),
 		SettingKeySMTPPort:                    "587",
@@ -436,6 +456,13 @@ func (s *SettingService) parseSettings(settings map[string]string) *SystemSettin
 		HideCcsImportButton:          settings[SettingKeyHideCcsImportButton] == "true",
 		PurchaseSubscriptionEnabled:  settings[SettingKeyPurchaseSubscriptionEnabled] == "true",
 		PurchaseSubscriptionURL:      strings.TrimSpace(settings[SettingKeyPurchaseSubscriptionURL]),
+		PurchaseInstructions:         settings[SettingKeyPurchaseInstructions],
+		PaymentProvider:              s.getStringOrDefault(settings, SettingKeyPaymentProvider, PaymentProviderManual),
+		XunhuPayAppID:                strings.TrimSpace(settings[SettingKeyXunhuPayAppID]),
+		XunhuPayGateway:              s.getStringOrDefault(settings, SettingKeyXunhuPayGateway, "https://api.xunhupay.com/payment/do.html"),
+		XunhuPayNotifyURL:            strings.TrimSpace(settings[SettingKeyXunhuPayNotifyURL]),
+		XunhuPayReturnURL:            strings.TrimSpace(settings[SettingKeyXunhuPayReturnURL]),
+		XunhuPayPlugins:              strings.TrimSpace(settings[SettingKeyXunhuPayPlugins]),
 	}
 
 	// 解析整数类型
@@ -461,6 +488,9 @@ func (s *SettingService) parseSettings(settings map[string]string) *SystemSettin
 	// 敏感信息直接返回，方便测试连接时使用
 	result.SMTPPassword = settings[SettingKeySMTPPassword]
 	result.TurnstileSecretKey = settings[SettingKeyTurnstileSecretKey]
+
+	result.XunhuPayAppSecret = strings.TrimSpace(settings[SettingKeyXunhuPayAppSecret])
+	result.XunhuPayAppSecretConfigured = result.XunhuPayAppSecret != ""
 
 	// LinuxDo Connect 设置：
 	// - 兼容 config.yaml/env（避免老部署因为未迁移到数据库设置而被意外关闭）
