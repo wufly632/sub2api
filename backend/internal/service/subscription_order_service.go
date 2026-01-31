@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/ent"
+	"github.com/Wei-Shaw/sub2api/ent/subscriptionorder"
 	infraerrors "github.com/Wei-Shaw/sub2api/internal/pkg/errors"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/pagination"
 )
@@ -21,6 +23,8 @@ var (
 	ErrPaymentInvalidSignature = infraerrors.BadRequest("PAYMENT_INVALID_SIGNATURE", "payment signature invalid")
 	ErrPaymentAmountMismatch = infraerrors.BadRequest("PAYMENT_AMOUNT_MISMATCH", "payment amount mismatch")
 )
+
+const orderPaymentTimeout = 5 * time.Minute
 
 // SubscriptionOrderService handles purchase orders for subscriptions.
 type SubscriptionOrderService struct {
@@ -127,6 +131,9 @@ func (s *SubscriptionOrderService) CreateOrder(ctx context.Context, userID, grou
 
 // ListUserOrders lists orders for a user.
 func (s *SubscriptionOrderService) ListUserOrders(ctx context.Context, userID int64, page, pageSize int, status string) ([]SubscriptionOrder, *pagination.PaginationResult, error) {
+	if err := s.cancelExpiredPending(ctx); err != nil {
+		log.Printf("[Order] cancel expired pending failed: %v", err)
+	}
 	params := pagination.PaginationParams{Page: page, PageSize: pageSize}
 	filters := SubscriptionOrderFilters{
 		Status: status,
@@ -137,12 +144,18 @@ func (s *SubscriptionOrderService) ListUserOrders(ctx context.Context, userID in
 
 // ListOrders lists orders with filters (admin).
 func (s *SubscriptionOrderService) ListOrders(ctx context.Context, page, pageSize int, filters SubscriptionOrderFilters) ([]SubscriptionOrder, *pagination.PaginationResult, error) {
+	if err := s.cancelExpiredPending(ctx); err != nil {
+		log.Printf("[Order] cancel expired pending failed: %v", err)
+	}
 	params := pagination.PaginationParams{Page: page, PageSize: pageSize}
 	return s.orderRepo.List(ctx, params, filters)
 }
 
 // GetOrderByID returns an order by ID.
 func (s *SubscriptionOrderService) GetOrderByID(ctx context.Context, id int64) (*SubscriptionOrder, error) {
+	if err := s.cancelExpiredPending(ctx); err != nil {
+		log.Printf("[Order] cancel expired pending failed: %v", err)
+	}
 	return s.orderRepo.GetByID(ctx, id)
 }
 
@@ -177,6 +190,9 @@ func (s *SubscriptionOrderService) Cancel(ctx context.Context, id int64) (*Subsc
 
 // HandleXunhuPayNotify handles payment notify callback.
 func (s *SubscriptionOrderService) HandleXunhuPayNotify(ctx context.Context, payload XunhuPayNotifyPayload) error {
+	if err := s.cancelExpiredPending(ctx); err != nil {
+		log.Printf("[Order] cancel expired pending failed: %v", err)
+	}
 	if s.settingService == nil || s.xunhuPayClient == nil {
 		return ErrPaymentNotConfigured
 	}
@@ -326,6 +342,23 @@ func (s *SubscriptionOrderService) resolvePaymentConfig(ctx context.Context, amo
 		return provider, nil, ErrPaymentNotConfigured
 	}
 	return provider, cfg, nil
+}
+
+func (s *SubscriptionOrderService) cancelExpiredPending(ctx context.Context) error {
+	if s.entClient == nil {
+		return nil
+	}
+	cutoff := time.Now().Add(-orderPaymentTimeout)
+	canceledAt := time.Now()
+	_, err := s.entClient.SubscriptionOrder.Update().
+		Where(
+			subscriptionorder.StatusEQ(OrderStatusPending),
+			subscriptionorder.CreatedAtLT(cutoff),
+		).
+		SetStatus(OrderStatusCanceled).
+		SetCanceledAt(canceledAt).
+		Save(ctx)
+	return err
 }
 
 func amountMatches(expected, actual float64) bool {
