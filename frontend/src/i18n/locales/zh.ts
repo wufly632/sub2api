@@ -3310,7 +3310,7 @@ export default {
     viewQr: '查看二维码',
     qrTitle: '扫码支付',
     qrCountdown: '二维码有效期',
-    qrTip: '请使用微信或支付宝扫码完成支付，支付成功后订阅将自动开通。',
+    qrTip: '请使用微信扫码完成支付，支付成功后订阅将自动开通。',
     qrUnavailable: '暂未返回二维码，请点击“打开支付页面”继续。',
     openPaymentPage: '打开支付页面',
     columns: {
