@@ -73,7 +73,7 @@ One-click installation script that downloads pre-built binaries from GitHub Rele
 #### Installation Steps
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Wei-Shaw/sub2api/main/deploy/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/wufly632/sub2api/main/deploy/install.sh | sudo bash
 ```
 
 The script will:
@@ -123,7 +123,7 @@ sudo journalctl -u sub2api -f
 sudo systemctl restart sub2api
 
 # Uninstall
-curl -sSL https://raw.githubusercontent.com/Wei-Shaw/sub2api/main/deploy/install.sh | sudo bash -s -- uninstall -y
+curl -sSL https://raw.githubusercontent.com/wufly632/sub2api/main/deploy/install.sh | sudo bash -s -- uninstall -y
 ```
 
 ---
@@ -168,8 +168,8 @@ If you prefer manual setup:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Wei-Shaw/sub2api.git
-cd sub2api/deploy
+git clone https://github.com/wufly632/sub2api.git
+cd sub2api
 
 # 2. Copy environment configuration
 cp .env.example .env
@@ -307,7 +307,7 @@ Build and run from source code for development or customization.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Wei-Shaw/sub2api.git
+git clone https://github.com/wufly632/sub2api.git
 cd sub2api
 
 # 2. Install pnpm (if not already installed)

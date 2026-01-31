@@ -96,6 +96,10 @@ func (s *groupRepoStubForAdmin) ListActiveByPlatform(_ context.Context, _ string
 	panic("unexpected ListActiveByPlatform call")
 }
 
+func (s *groupRepoStubForAdmin) ListPurchasePlans(_ context.Context) ([]Group, error) {
+	panic("unexpected ListPurchasePlans call")
+}
+
 func (s *groupRepoStubForAdmin) ExistsByName(_ context.Context, _ string) (bool, error) {
 	panic("unexpected ExistsByName call")
 }
@@ -373,6 +377,10 @@ func (s *groupRepoStubForFallbackCycle) ListActive(_ context.Context) ([]Group, 
 
 func (s *groupRepoStubForFallbackCycle) ListActiveByPlatform(_ context.Context, _ string) ([]Group, error) {
 	panic("unexpected ListActiveByPlatform call")
+}
+
+func (s *groupRepoStubForFallbackCycle) ListPurchasePlans(_ context.Context) ([]Group, error) {
+	panic("unexpected ListPurchasePlans call")
 }
 
 func (s *groupRepoStubForFallbackCycle) ExistsByName(_ context.Context, _ string) (bool, error) {

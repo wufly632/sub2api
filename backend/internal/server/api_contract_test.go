@@ -876,6 +876,10 @@ func (r *stubGroupRepo) ListActiveByPlatform(ctx context.Context, platform strin
 	return out, nil
 }
 
+func (r *stubGroupRepo) ListPurchasePlans(ctx context.Context) ([]service.Group, error) {
+	return append([]service.Group(nil), r.active...), nil
+}
+
 func (stubGroupRepo) ExistsByName(ctx context.Context, name string) (bool, error) {
 	return false, errors.New("not implemented")
 }
