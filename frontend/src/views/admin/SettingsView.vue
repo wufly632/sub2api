@@ -977,6 +977,132 @@
                 {{ t('admin.settings.purchase.iframeWarning') }}
               </p>
             </div>
+
+            <!-- Instructions -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ t('admin.settings.purchase.instructions') }}
+              </label>
+              <textarea
+                v-model="form.purchase_instructions"
+                rows="5"
+                class="input font-mono text-sm"
+                :placeholder="t('admin.settings.purchase.instructionsPlaceholder')"
+              ></textarea>
+              <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                {{ t('admin.settings.purchase.instructionsHint') }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Settings -->
+        <div class="card">
+          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ t('admin.settings.payment.title') }}
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {{ t('admin.settings.payment.description') }}
+            </p>
+          </div>
+          <div class="space-y-6 p-6">
+            <div>
+              <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ t('admin.settings.payment.provider') }}
+              </label>
+              <select v-model="form.payment_provider" class="input">
+                <option value="manual">{{ t('admin.settings.payment.providerManual') }}</option>
+                <option value="xunhupay">{{ t('admin.settings.payment.providerXunhu') }}</option>
+              </select>
+            </div>
+
+            <div v-if="form.payment_provider === 'xunhupay'" class="space-y-4">
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuAppId') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_appid"
+                  type="text"
+                  class="input font-mono text-sm"
+                  :placeholder="t('admin.settings.payment.xunhuAppIdPlaceholder')"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuAppSecret') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_appsecret"
+                  type="password"
+                  class="input font-mono text-sm"
+                  :placeholder="
+                    form.xunhupay_appsecret_configured
+                      ? t('admin.settings.payment.secretConfigured')
+                      : t('admin.settings.payment.secretPlaceholder')
+                  "
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t('admin.settings.payment.secretHint') }}
+                </p>
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuGateway') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_gateway"
+                  type="url"
+                  class="input font-mono text-sm"
+                  :placeholder="t('admin.settings.payment.xunhuGatewayPlaceholder')"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuNotifyUrl') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_notify_url"
+                  type="url"
+                  class="input font-mono text-sm"
+                  :placeholder="t('admin.settings.payment.xunhuNotifyUrlPlaceholder')"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t('admin.settings.payment.notifyHint') }}
+                </p>
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuReturnUrl') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_return_url"
+                  type="url"
+                  class="input font-mono text-sm"
+                  :placeholder="t('admin.settings.payment.xunhuReturnUrlPlaceholder')"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('admin.settings.payment.xunhuPlugins') }}
+                </label>
+                <input
+                  v-model="form.xunhupay_plugins"
+                  type="text"
+                  class="input font-mono text-sm"
+                  :placeholder="t('admin.settings.payment.xunhuPluginsPlaceholder')"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {{ t('admin.settings.payment.pluginsHint') }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1109,6 +1235,7 @@ type SettingsForm = SystemSettings & {
   smtp_password: string
   turnstile_secret_key: string
   linuxdo_connect_client_secret: string
+  xunhupay_appsecret: string
 }
 
 const form = reactive<SettingsForm>({
@@ -1130,6 +1257,15 @@ const form = reactive<SettingsForm>({
   hide_ccs_import_button: false,
   purchase_subscription_enabled: false,
   purchase_subscription_url: '',
+  purchase_instructions: '',
+  payment_provider: 'manual',
+  xunhupay_appid: '',
+  xunhupay_appsecret: '',
+  xunhupay_appsecret_configured: false,
+  xunhupay_gateway: 'https://api.xunhupay.com/payment/do.html',
+  xunhupay_notify_url: '',
+  xunhupay_return_url: '',
+  xunhupay_plugins: '',
   smtp_host: '',
   smtp_port: 587,
   smtp_username: '',
@@ -1227,6 +1363,7 @@ async function loadSettings() {
     form.smtp_password = ''
     form.turnstile_secret_key = ''
     form.linuxdo_connect_client_secret = ''
+    form.xunhupay_appsecret = ''
   } catch (error: any) {
     appStore.showError(
       t('admin.settings.failedToLoad') + ': ' + (error.message || t('common.unknownError'))
@@ -1257,6 +1394,14 @@ async function saveSettings() {
       hide_ccs_import_button: form.hide_ccs_import_button,
       purchase_subscription_enabled: form.purchase_subscription_enabled,
       purchase_subscription_url: form.purchase_subscription_url,
+      purchase_instructions: form.purchase_instructions,
+      payment_provider: form.payment_provider,
+      xunhupay_appid: form.xunhupay_appid,
+      xunhupay_appsecret: form.xunhupay_appsecret || undefined,
+      xunhupay_gateway: form.xunhupay_gateway,
+      xunhupay_notify_url: form.xunhupay_notify_url,
+      xunhupay_return_url: form.xunhupay_return_url,
+      xunhupay_plugins: form.xunhupay_plugins,
       smtp_host: form.smtp_host,
       smtp_port: form.smtp_port,
       smtp_username: form.smtp_username,
@@ -1284,6 +1429,7 @@ async function saveSettings() {
     form.smtp_password = ''
     form.turnstile_secret_key = ''
     form.linuxdo_connect_client_secret = ''
+    form.xunhupay_appsecret = ''
     // Refresh cached public settings so sidebar/header update immediately
     await appStore.fetchPublicSettings(true)
     appStore.showSuccess(t('admin.settings.settingsSaved'))

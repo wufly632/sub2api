@@ -16,6 +16,7 @@ export { userAPI } from './user'
 export { redeemAPI, type RedeemHistoryItem } from './redeem'
 export { userGroupsAPI } from './groups'
 export { totpAPI } from './totp'
+export { purchaseAPI } from './purchase'
 
 // Admin APIs
 export { adminAPI } from './admin'

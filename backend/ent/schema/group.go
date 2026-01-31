@@ -73,6 +73,16 @@ func (Group) Fields() []ent.Field {
 		field.Int("default_validity_days").
 			Default(30),
 
+		// Purchase settings (used for subscription purchase plans)
+		field.Bool("purchase_enabled").
+			Default(false),
+		field.Float("purchase_price").
+			Optional().
+			Nillable().
+			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}),
+		field.Int("purchase_display_order").
+			Default(0),
+
 		// 图片生成计费配置（antigravity 和 gemini 平台使用）
 		field.Float("image_price_1k").
 			Optional().
@@ -114,6 +124,7 @@ func (Group) Edges() []ent.Edge {
 		edge.To("api_keys", APIKey.Type),
 		edge.To("redeem_codes", RedeemCode.Type),
 		edge.To("subscriptions", UserSubscription.Type),
+		edge.To("subscription_orders", SubscriptionOrder.Type),
 		edge.To("usage_logs", UsageLog.Type),
 		edge.From("accounts", Account.Type).
 			Ref("groups").

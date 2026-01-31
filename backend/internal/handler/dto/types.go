@@ -55,6 +55,10 @@ type Group struct {
 	DailyLimitUSD    *float64 `json:"daily_limit_usd"`
 	WeeklyLimitUSD   *float64 `json:"weekly_limit_usd"`
 	MonthlyLimitUSD  *float64 `json:"monthly_limit_usd"`
+	DefaultValidityDays int   `json:"default_validity_days"`
+	PurchaseEnabled     bool     `json:"purchase_enabled"`
+	PurchasePrice       *float64 `json:"purchase_price"`
+	PurchaseDisplayOrder int     `json:"purchase_display_order"`
 
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	ImagePrice1K *float64 `json:"image_price_1k"`
@@ -347,6 +351,38 @@ type AdminUserSubscription struct {
 	Notes      string    `json:"notes"`
 
 	AssignedByUser *User `json:"assigned_by_user,omitempty"`
+}
+
+type SubscriptionOrder struct {
+	ID             int64      `json:"id"`
+	OrderNo        string     `json:"order_no"`
+	UserID         int64      `json:"user_id"`
+	GroupID        int64      `json:"group_id"`
+	SubscriptionID *int64     `json:"subscription_id,omitempty"`
+	PaymentProvider      string  `json:"payment_provider"`
+	PaymentURL           string  `json:"payment_url"`
+	PaymentQRCode        string  `json:"payment_qrcode"`
+	PaymentOpenOrderID   string  `json:"payment_open_order_id"`
+	PaymentTransactionID string  `json:"payment_transaction_id"`
+	PaymentPlugin        string  `json:"payment_plugin"`
+	Status         string     `json:"status"`
+	Amount         float64    `json:"amount"`
+	Currency       string     `json:"currency"`
+	ValidityDays   int        `json:"validity_days"`
+	PaidAt         *time.Time `json:"paid_at,omitempty"`
+	CanceledAt     *time.Time `json:"canceled_at,omitempty"`
+	Notes          string     `json:"notes"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+
+	Group        *Group            `json:"group,omitempty"`
+	Subscription *UserSubscription `json:"subscription,omitempty"`
+}
+
+// AdminSubscriptionOrder adds user info for admin views.
+type AdminSubscriptionOrder struct {
+	SubscriptionOrder
+	User *User `json:"user,omitempty"`
 }
 
 type BulkAssignResult struct {

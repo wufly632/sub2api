@@ -133,6 +133,10 @@ func groupFromServiceBase(g *service.Group) Group {
 		DailyLimitUSD:    g.DailyLimitUSD,
 		WeeklyLimitUSD:   g.WeeklyLimitUSD,
 		MonthlyLimitUSD:  g.MonthlyLimitUSD,
+		DefaultValidityDays: g.DefaultValidityDays,
+		PurchaseEnabled:  g.PurchaseEnabled,
+		PurchasePrice:    g.PurchasePrice,
+		PurchaseDisplayOrder: g.PurchaseDisplayOrder,
 		ImagePrice1K:     g.ImagePrice1K,
 		ImagePrice2K:     g.ImagePrice2K,
 		ImagePrice4K:     g.ImagePrice4K,
@@ -511,6 +515,46 @@ func BulkAssignResultFromService(r *service.BulkAssignResult) *BulkAssignResult 
 		FailedCount:   r.FailedCount,
 		Subscriptions: subs,
 		Errors:        r.Errors,
+	}
+}
+
+func SubscriptionOrderFromService(o *service.SubscriptionOrder) *SubscriptionOrder {
+	if o == nil {
+		return nil
+	}
+	return &SubscriptionOrder{
+		ID:             o.ID,
+		OrderNo:        o.OrderNo,
+		UserID:         o.UserID,
+		GroupID:        o.GroupID,
+		SubscriptionID: o.SubscriptionID,
+		PaymentProvider:      o.PaymentProvider,
+		PaymentURL:           o.PaymentURL,
+		PaymentQRCode:        o.PaymentQRCode,
+		PaymentOpenOrderID:   o.PaymentOpenOrderID,
+		PaymentTransactionID: o.PaymentTransactionID,
+		PaymentPlugin:        o.PaymentPlugin,
+		Status:         o.Status,
+		Amount:         o.Amount,
+		Currency:       o.Currency,
+		ValidityDays:   o.ValidityDays,
+		PaidAt:         o.PaidAt,
+		CanceledAt:     o.CanceledAt,
+		Notes:          o.Notes,
+		CreatedAt:      o.CreatedAt,
+		UpdatedAt:      o.UpdatedAt,
+		Group:          GroupFromServiceShallow(o.Group),
+		Subscription:   UserSubscriptionFromService(o.Subscription),
+	}
+}
+
+func SubscriptionOrderFromServiceAdmin(o *service.SubscriptionOrder) *AdminSubscriptionOrder {
+	if o == nil {
+		return nil
+	}
+	return &AdminSubscriptionOrder{
+		SubscriptionOrder: *SubscriptionOrderFromService(o),
+		User:              UserFromServiceShallow(o.User),
 	}
 }
 

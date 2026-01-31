@@ -125,6 +125,21 @@ func DefaultValidityDays(v int) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldDefaultValidityDays, v))
 }
 
+// PurchaseEnabled applies equality check predicate on the "purchase_enabled" field. It's identical to PurchaseEnabledEQ.
+func PurchaseEnabled(v bool) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchaseEnabled, v))
+}
+
+// PurchasePrice applies equality check predicate on the "purchase_price" field. It's identical to PurchasePriceEQ.
+func PurchasePrice(v float64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchasePrice, v))
+}
+
+// PurchaseDisplayOrder applies equality check predicate on the "purchase_display_order" field. It's identical to PurchaseDisplayOrderEQ.
+func PurchaseDisplayOrder(v int) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchaseDisplayOrder, v))
+}
+
 // ImagePrice1k applies equality check predicate on the "image_price_1k" field. It's identical to ImagePrice1kEQ.
 func ImagePrice1k(v float64) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldImagePrice1k, v))
@@ -860,6 +875,106 @@ func DefaultValidityDaysLTE(v int) predicate.Group {
 	return predicate.Group(sql.FieldLTE(FieldDefaultValidityDays, v))
 }
 
+// PurchaseEnabledEQ applies the EQ predicate on the "purchase_enabled" field.
+func PurchaseEnabledEQ(v bool) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchaseEnabled, v))
+}
+
+// PurchaseEnabledNEQ applies the NEQ predicate on the "purchase_enabled" field.
+func PurchaseEnabledNEQ(v bool) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldPurchaseEnabled, v))
+}
+
+// PurchasePriceEQ applies the EQ predicate on the "purchase_price" field.
+func PurchasePriceEQ(v float64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchasePrice, v))
+}
+
+// PurchasePriceNEQ applies the NEQ predicate on the "purchase_price" field.
+func PurchasePriceNEQ(v float64) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldPurchasePrice, v))
+}
+
+// PurchasePriceIn applies the In predicate on the "purchase_price" field.
+func PurchasePriceIn(vs ...float64) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldPurchasePrice, vs...))
+}
+
+// PurchasePriceNotIn applies the NotIn predicate on the "purchase_price" field.
+func PurchasePriceNotIn(vs ...float64) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldPurchasePrice, vs...))
+}
+
+// PurchasePriceGT applies the GT predicate on the "purchase_price" field.
+func PurchasePriceGT(v float64) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldPurchasePrice, v))
+}
+
+// PurchasePriceGTE applies the GTE predicate on the "purchase_price" field.
+func PurchasePriceGTE(v float64) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldPurchasePrice, v))
+}
+
+// PurchasePriceLT applies the LT predicate on the "purchase_price" field.
+func PurchasePriceLT(v float64) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldPurchasePrice, v))
+}
+
+// PurchasePriceLTE applies the LTE predicate on the "purchase_price" field.
+func PurchasePriceLTE(v float64) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldPurchasePrice, v))
+}
+
+// PurchasePriceIsNil applies the IsNil predicate on the "purchase_price" field.
+func PurchasePriceIsNil() predicate.Group {
+	return predicate.Group(sql.FieldIsNull(FieldPurchasePrice))
+}
+
+// PurchasePriceNotNil applies the NotNil predicate on the "purchase_price" field.
+func PurchasePriceNotNil() predicate.Group {
+	return predicate.Group(sql.FieldNotNull(FieldPurchasePrice))
+}
+
+// PurchaseDisplayOrderEQ applies the EQ predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderEQ(v int) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldPurchaseDisplayOrder, v))
+}
+
+// PurchaseDisplayOrderNEQ applies the NEQ predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderNEQ(v int) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldPurchaseDisplayOrder, v))
+}
+
+// PurchaseDisplayOrderIn applies the In predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderIn(vs ...int) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldPurchaseDisplayOrder, vs...))
+}
+
+// PurchaseDisplayOrderNotIn applies the NotIn predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderNotIn(vs ...int) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldPurchaseDisplayOrder, vs...))
+}
+
+// PurchaseDisplayOrderGT applies the GT predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderGT(v int) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldPurchaseDisplayOrder, v))
+}
+
+// PurchaseDisplayOrderGTE applies the GTE predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderGTE(v int) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldPurchaseDisplayOrder, v))
+}
+
+// PurchaseDisplayOrderLT applies the LT predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderLT(v int) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldPurchaseDisplayOrder, v))
+}
+
+// PurchaseDisplayOrderLTE applies the LTE predicate on the "purchase_display_order" field.
+func PurchaseDisplayOrderLTE(v int) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldPurchaseDisplayOrder, v))
+}
+
 // ImagePrice1kEQ applies the EQ predicate on the "image_price_1k" field.
 func ImagePrice1kEQ(v float64) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldImagePrice1k, v))
@@ -1151,6 +1266,29 @@ func HasSubscriptions() predicate.Group {
 func HasSubscriptionsWith(preds ...predicate.UserSubscription) predicate.Group {
 	return predicate.Group(func(s *sql.Selector) {
 		step := newSubscriptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubscriptionOrders applies the HasEdge predicate on the "subscription_orders" edge.
+func HasSubscriptionOrders() predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubscriptionOrdersTable, SubscriptionOrdersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubscriptionOrdersWith applies the HasEdge predicate on the "subscription_orders" edge with a given conditions (other predicates).
+func HasSubscriptionOrdersWith(preds ...predicate.SubscriptionOrder) predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := newSubscriptionOrdersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

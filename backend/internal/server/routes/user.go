@@ -79,5 +79,14 @@ func RegisterUserRoutes(
 			subscriptions.GET("/progress", h.Subscription.GetProgress)
 			subscriptions.GET("/summary", h.Subscription.GetSummary)
 		}
+
+		// 购买订阅
+		purchase := authenticated.Group("/purchase")
+		{
+			purchase.GET("/plans", h.Purchase.ListPlans)
+			purchase.GET("/orders", h.Purchase.ListOrders)
+			purchase.POST("/orders", h.Purchase.CreateOrder)
+			purchase.GET("/orders/:id", h.Purchase.GetOrder)
+		}
 	}
 }

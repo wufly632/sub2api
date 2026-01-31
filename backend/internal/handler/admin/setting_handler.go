@@ -75,6 +75,14 @@ func (h *SettingHandler) GetSettings(c *gin.Context) {
 		HideCcsImportButton:                  settings.HideCcsImportButton,
 		PurchaseSubscriptionEnabled:          settings.PurchaseSubscriptionEnabled,
 		PurchaseSubscriptionURL:              settings.PurchaseSubscriptionURL,
+		PurchaseInstructions:                 settings.PurchaseInstructions,
+		PaymentProvider:                      settings.PaymentProvider,
+		XunhuPayAppID:                        settings.XunhuPayAppID,
+		XunhuPayAppSecretConfigured:          settings.XunhuPayAppSecretConfigured,
+		XunhuPayGateway:                      settings.XunhuPayGateway,
+		XunhuPayNotifyURL:                    settings.XunhuPayNotifyURL,
+		XunhuPayReturnURL:                    settings.XunhuPayReturnURL,
+		XunhuPayPlugins:                      settings.XunhuPayPlugins,
 		DefaultConcurrency:                   settings.DefaultConcurrency,
 		DefaultBalance:                       settings.DefaultBalance,
 		EnableModelFallback:                  settings.EnableModelFallback,
@@ -131,6 +139,14 @@ type UpdateSettingsRequest struct {
 	HideCcsImportButton         bool    `json:"hide_ccs_import_button"`
 	PurchaseSubscriptionEnabled *bool   `json:"purchase_subscription_enabled"`
 	PurchaseSubscriptionURL     *string `json:"purchase_subscription_url"`
+	PurchaseInstructions        *string `json:"purchase_instructions"`
+	PaymentProvider             string  `json:"payment_provider"`
+	XunhuPayAppID               string  `json:"xunhupay_appid"`
+	XunhuPayAppSecret           string  `json:"xunhupay_appsecret"`
+	XunhuPayGateway             string  `json:"xunhupay_gateway"`
+	XunhuPayNotifyURL           string  `json:"xunhupay_notify_url"`
+	XunhuPayReturnURL           string  `json:"xunhupay_return_url"`
+	XunhuPayPlugins             string  `json:"xunhupay_plugins"`
 
 	// 默认配置
 	DefaultConcurrency int     `json:"default_concurrency"`
@@ -255,22 +271,79 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 	if req.PurchaseSubscriptionURL != nil {
 		purchaseURL = strings.TrimSpace(*req.PurchaseSubscriptionURL)
 	}
+	purchaseInstructions := previousSettings.PurchaseInstructions
+	if req.PurchaseInstructions != nil {
+		purchaseInstructions = strings.TrimSpace(*req.PurchaseInstructions)
+	}
 
-	// - 启用时要求 URL 合法且非空
-	// - 禁用时允许为空；若提供了 URL 也做基本校验，避免误配置
-	if purchaseEnabled {
-		if purchaseURL == "" {
-			response.BadRequest(c, "Purchase Subscription URL is required when enabled")
-			return
-		}
+	paymentProvider := strings.TrimSpace(req.PaymentProvider)
+	if paymentProvider == "" {
+		paymentProvider = previousSettings.PaymentProvider
+	}
+	xunhuAppID := strings.TrimSpace(req.XunhuPayAppID)
+	if xunhuAppID == "" {
+		xunhuAppID = previousSettings.XunhuPayAppID
+	}
+	xunhuAppSecret := strings.TrimSpace(req.XunhuPayAppSecret)
+	if xunhuAppSecret == "" {
+		xunhuAppSecret = previousSettings.XunhuPayAppSecret
+	}
+	xunhuGateway := strings.TrimSpace(req.XunhuPayGateway)
+	if xunhuGateway == "" {
+		xunhuGateway = previousSettings.XunhuPayGateway
+	}
+	xunhuNotifyURL := strings.TrimSpace(req.XunhuPayNotifyURL)
+	if xunhuNotifyURL == "" {
+		xunhuNotifyURL = previousSettings.XunhuPayNotifyURL
+	}
+	xunhuReturnURL := strings.TrimSpace(req.XunhuPayReturnURL)
+	xunhuPlugins := strings.TrimSpace(req.XunhuPayPlugins)
+
+	// 若提供 URL 做基本校验，避免误配置
+	if purchaseURL != "" {
 		if err := config.ValidateAbsoluteHTTPURL(purchaseURL); err != nil {
 			response.BadRequest(c, "Purchase Subscription URL must be an absolute http(s) URL")
 			return
 		}
-	} else if purchaseURL != "" {
-		if err := config.ValidateAbsoluteHTTPURL(purchaseURL); err != nil {
-			response.BadRequest(c, "Purchase Subscription URL must be an absolute http(s) URL")
+	}
+
+	if paymentProvider == "" {
+		paymentProvider = service.PaymentProviderManual
+	}
+	if paymentProvider != service.PaymentProviderManual && paymentProvider != service.PaymentProviderXunhuPay {
+		response.BadRequest(c, "Payment provider invalid")
+		return
+	}
+	if paymentProvider == service.PaymentProviderXunhuPay {
+		if xunhuAppID == "" {
+			response.BadRequest(c, "XunhuPay App ID is required when enabled")
 			return
+		}
+		if xunhuAppSecret == "" {
+			response.BadRequest(c, "XunhuPay App Secret is required when enabled")
+			return
+		}
+		if xunhuGateway == "" {
+			response.BadRequest(c, "XunhuPay Gateway URL is required when enabled")
+			return
+		}
+		if err := config.ValidateAbsoluteHTTPURL(xunhuGateway); err != nil {
+			response.BadRequest(c, "XunhuPay Gateway URL must be an absolute http(s) URL")
+			return
+		}
+		if xunhuNotifyURL == "" {
+			response.BadRequest(c, "XunhuPay Notify URL is required when enabled")
+			return
+		}
+		if err := config.ValidateAbsoluteHTTPURL(xunhuNotifyURL); err != nil {
+			response.BadRequest(c, "XunhuPay Notify URL must be an absolute http(s) URL")
+			return
+		}
+		if xunhuReturnURL != "" {
+			if err := config.ValidateAbsoluteHTTPURL(xunhuReturnURL); err != nil {
+				response.BadRequest(c, "XunhuPay Return URL must be an absolute http(s) URL")
+				return
+			}
 		}
 	}
 
@@ -316,6 +389,14 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		HideCcsImportButton:         req.HideCcsImportButton,
 		PurchaseSubscriptionEnabled: purchaseEnabled,
 		PurchaseSubscriptionURL:     purchaseURL,
+		PurchaseInstructions:        purchaseInstructions,
+		PaymentProvider:             paymentProvider,
+		XunhuPayAppID:               xunhuAppID,
+		XunhuPayAppSecret:           xunhuAppSecret,
+		XunhuPayGateway:             xunhuGateway,
+		XunhuPayNotifyURL:           xunhuNotifyURL,
+		XunhuPayReturnURL:           xunhuReturnURL,
+		XunhuPayPlugins:             xunhuPlugins,
 		DefaultConcurrency:          req.DefaultConcurrency,
 		DefaultBalance:              req.DefaultBalance,
 		EnableModelFallback:         req.EnableModelFallback,
@@ -396,6 +477,14 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		HideCcsImportButton:                  updatedSettings.HideCcsImportButton,
 		PurchaseSubscriptionEnabled:          updatedSettings.PurchaseSubscriptionEnabled,
 		PurchaseSubscriptionURL:              updatedSettings.PurchaseSubscriptionURL,
+		PurchaseInstructions:                 updatedSettings.PurchaseInstructions,
+		PaymentProvider:                      updatedSettings.PaymentProvider,
+		XunhuPayAppID:                        updatedSettings.XunhuPayAppID,
+		XunhuPayAppSecretConfigured:          updatedSettings.XunhuPayAppSecretConfigured,
+		XunhuPayGateway:                      updatedSettings.XunhuPayGateway,
+		XunhuPayNotifyURL:                    updatedSettings.XunhuPayNotifyURL,
+		XunhuPayReturnURL:                    updatedSettings.XunhuPayReturnURL,
+		XunhuPayPlugins:                      updatedSettings.XunhuPayPlugins,
 		DefaultConcurrency:                   updatedSettings.DefaultConcurrency,
 		DefaultBalance:                       updatedSettings.DefaultBalance,
 		EnableModelFallback:                  updatedSettings.EnableModelFallback,
@@ -511,6 +600,36 @@ func diffSettings(before *service.SystemSettings, after *service.SystemSettings,
 	}
 	if before.HideCcsImportButton != after.HideCcsImportButton {
 		changed = append(changed, "hide_ccs_import_button")
+	}
+	if before.PurchaseSubscriptionEnabled != after.PurchaseSubscriptionEnabled {
+		changed = append(changed, "purchase_subscription_enabled")
+	}
+	if before.PurchaseSubscriptionURL != after.PurchaseSubscriptionURL {
+		changed = append(changed, "purchase_subscription_url")
+	}
+	if before.PurchaseInstructions != after.PurchaseInstructions {
+		changed = append(changed, "purchase_instructions")
+	}
+	if before.PaymentProvider != after.PaymentProvider {
+		changed = append(changed, "payment_provider")
+	}
+	if before.XunhuPayAppID != after.XunhuPayAppID {
+		changed = append(changed, "xunhupay_appid")
+	}
+	if req.XunhuPayAppSecret != "" {
+		changed = append(changed, "xunhupay_appsecret")
+	}
+	if before.XunhuPayGateway != after.XunhuPayGateway {
+		changed = append(changed, "xunhupay_gateway")
+	}
+	if before.XunhuPayNotifyURL != after.XunhuPayNotifyURL {
+		changed = append(changed, "xunhupay_notify_url")
+	}
+	if before.XunhuPayReturnURL != after.XunhuPayReturnURL {
+		changed = append(changed, "xunhupay_return_url")
+	}
+	if before.XunhuPayPlugins != after.XunhuPayPlugins {
+		changed = append(changed, "xunhupay_plugins")
 	}
 	if before.DefaultConcurrency != after.DefaultConcurrency {
 		changed = append(changed, "default_concurrency")
