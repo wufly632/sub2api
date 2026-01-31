@@ -652,7 +652,7 @@ install_service() {
     print_info "$(msg 'installing_service')"
 
     # Create service file with configured host and port
-    cat > /etc/systemd/system/sub2api.service << EOF
+    cat > /etc/systemd/system/sub2api-wufly.service << EOF
 [Unit]
 Description=Sub2API - AI API Gateway Platform
 Documentation=https://github.com/Wei-Shaw/sub2api
@@ -663,8 +663,8 @@ Wants=postgresql.service redis.service
 Type=simple
 User=sub2api
 Group=sub2api
-WorkingDirectory=/opt/sub2api
-ExecStart=/opt/sub2api/sub2api
+WorkingDirectory=/opt/sub2api-wufly
+ExecStart=/opt/sub2api-wufly/sub2api
 Restart=always
 RestartSec=5
 StandardOutput=journal
@@ -676,7 +676,7 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
-ReadWritePaths=/opt/sub2api
+ReadWritePaths=/opt/sub2api-wufly
 
 # Environment - Server configuration
 Environment=GIN_MODE=release
@@ -725,12 +725,12 @@ get_public_ip() {
 start_service() {
     print_info "$(msg 'starting_service')"
 
-    if systemctl start sub2api; then
+    if systemctl start sub2api-wufly; then
         print_success "$(msg 'service_started')"
         return 0
     else
         print_error "$(msg 'service_start_failed')"
-        print_info "sudo journalctl -u sub2api -n 50"
+        print_info "sudo journalctl -u sub2api-wufly -n 50"
         return 1
     fi
 }
@@ -739,7 +739,7 @@ start_service() {
 enable_autostart() {
     print_info "$(msg 'enabling_autostart')"
 
-    if systemctl enable sub2api 2>/dev/null; then
+    if systemctl enable sub2api-wufly 2>/dev/null; then
         print_success "$(msg 'autostart_enabled')"
         return 0
     else
@@ -780,10 +780,10 @@ print_completion() {
     echo "  $(msg 'useful_commands')"
     echo "=============================================="
     echo ""
-    echo "  $(msg 'cmd_status'):   sudo systemctl status sub2api"
-    echo "  $(msg 'cmd_logs'):     sudo journalctl -u sub2api -f"
-    echo "  $(msg 'cmd_restart'):  sudo systemctl restart sub2api"
-    echo "  $(msg 'cmd_stop'):     sudo systemctl stop sub2api"
+    echo "  $(msg 'cmd_status'):   sudo systemctl status sub2api-wufly"
+    echo "  $(msg 'cmd_logs'):     sudo journalctl -u sub2api-wufly -f"
+    echo "  $(msg 'cmd_restart'):  sudo systemctl restart sub2api-wufly"
+    echo "  $(msg 'cmd_stop'):     sudo systemctl stop sub2api-wufly"
     echo ""
     echo "=============================================="
 }
@@ -804,9 +804,9 @@ upgrade() {
     print_info "$(msg 'current_version'): $CURRENT_VERSION"
 
     # Stop service
-    if systemctl is-active --quiet sub2api; then
+    if systemctl is-active --quiet sub2api-wufly; then
         print_info "$(msg 'stopping_service')"
-        systemctl stop sub2api
+        systemctl stop sub2api-wufly
     fi
 
     # Backup current binary
@@ -822,7 +822,7 @@ upgrade() {
 
     # Start service
     print_info "$(msg 'starting_service')"
-    systemctl start sub2api
+    systemctl start sub2api-wufly
 
     print_success "$(msg 'upgrade_complete')"
 }
@@ -856,9 +856,9 @@ install_version() {
     fi
 
     # Stop service if running
-    if systemctl is-active --quiet sub2api; then
+    if systemctl is-active --quiet sub2api-wufly; then
         print_info "$(msg 'stopping_service')"
-        systemctl stop sub2api
+        systemctl stop sub2api-wufly
     fi
 
     # Backup current binary (for potential recovery)
@@ -884,11 +884,11 @@ install_version() {
 
     # Start service
     print_info "$(msg 'starting_service')"
-    if systemctl start sub2api; then
+    if systemctl start sub2api-wufly; then
         print_success "$(msg 'service_started')"
     else
         print_error "$(msg 'service_start_failed')"
-        print_info "sudo journalctl -u sub2api -n 50"
+        print_info "sudo journalctl -u sub2api-wufly -n 50"
     fi
 
     # Print completion message
@@ -923,11 +923,11 @@ uninstall() {
     fi
 
     print_info "$(msg 'stopping_service')"
-    systemctl stop sub2api 2>/dev/null || true
-    systemctl disable sub2api 2>/dev/null || true
+    systemctl stop sub2api-wufly 2>/dev/null || true
+    systemctl disable sub2api-wufly 2>/dev/null || true
 
     print_info "$(msg 'removing_files')"
-    rm -f /etc/systemd/system/sub2api.service
+    rm -f /etc/systemd/system/sub2api-wufly.service
     systemctl daemon-reload
 
     print_info "$(msg 'removing_install_dir')"
