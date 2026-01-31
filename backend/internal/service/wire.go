@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
+	"github.com/Wei-Shaw/sub2api/ent"
 	"github.com/google/wire"
 	"github.com/redis/go-redis/v9"
 )
@@ -75,6 +76,13 @@ func ProvideAccountExpiryService(accountRepo AccountRepository) *AccountExpirySe
 // ProvideSubscriptionExpiryService creates and starts SubscriptionExpiryService.
 func ProvideSubscriptionExpiryService(userSubRepo UserSubscriptionRepository) *SubscriptionExpiryService {
 	svc := NewSubscriptionExpiryService(userSubRepo, time.Minute)
+	svc.Start()
+	return svc
+}
+
+// ProvideSubscriptionOrderExpiryService creates and starts SubscriptionOrderExpiryService.
+func ProvideSubscriptionOrderExpiryService(entClient *ent.Client) *SubscriptionOrderExpiryService {
+	svc := NewSubscriptionOrderExpiryService(entClient, 30*time.Second)
 	svc.Start()
 	return svc
 }
@@ -266,6 +274,7 @@ var ProviderSet = wire.NewSet(
 	ProvideTokenRefreshService,
 	ProvideAccountExpiryService,
 	ProvideSubscriptionExpiryService,
+	ProvideSubscriptionOrderExpiryService,
 	ProvideTimingWheelService,
 	ProvideDashboardAggregationService,
 	ProvideUsageCleanupService,
