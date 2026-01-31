@@ -181,6 +181,10 @@ func TestAPIContracts(t *testing.T) {
 						"daily_limit_usd": null,
 						"weekly_limit_usd": null,
 						"monthly_limit_usd": null,
+						"default_validity_days": 0,
+						"purchase_enabled": false,
+						"purchase_price": null,
+						"purchase_display_order": 0,
 						"image_price_1k": null,
 						"image_price_2k": null,
 						"image_price_4k": null,
@@ -498,8 +502,16 @@ func TestAPIContracts(t *testing.T) {
 					"invitation_code_enabled": false,
 					"home_content": "",
 					"hide_ccs_import_button": false,
+					"payment_provider": "manual",
+					"purchase_instructions": "",
 					"purchase_subscription_enabled": false,
-					"purchase_subscription_url": ""
+					"purchase_subscription_url": "",
+					"xunhupay_appid": "",
+					"xunhupay_appsecret_configured": false,
+					"xunhupay_gateway": "https://api.xunhupay.com/payment/do.html",
+					"xunhupay_notify_url": "",
+					"xunhupay_plugins": "",
+					"xunhupay_return_url": ""
 				}
 			}`,
 		},
