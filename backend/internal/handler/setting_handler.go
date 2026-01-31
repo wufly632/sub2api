@@ -51,6 +51,7 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 		HideCcsImportButton:              settings.HideCcsImportButton,
 		PurchaseSubscriptionEnabled:      settings.PurchaseSubscriptionEnabled,
 		PurchaseSubscriptionURL:          settings.PurchaseSubscriptionURL,
+		PurchaseInstructions:             settings.PurchaseInstructions,
 		CustomMenuItems:                  dto.ParseUserVisibleMenuItems(settings.CustomMenuItems),
 		LinuxDoOAuthEnabled:              settings.LinuxDoOAuthEnabled,
 		SoraClientEnabled:                settings.SoraClientEnabled,

@@ -3953,9 +3953,35 @@ export default {
         urlPlaceholder: 'https://example.com/purchase',
         urlHint: '必须是完整的 http(s) 链接',
         iframeWarning:
-          '⚠️ iframe 提示：部分网站会通过 X-Frame-Options 或 CSP（frame-ancestors）禁止被 iframe 嵌入，出现空白时可引导用户使用”新窗口打开”。',
+          '⚠️ iframe 提示：部分网站会通过 X-Frame-Options 或 CSP（frame-ancestors）禁止被 iframe 嵌入，出现空白时可引导用户使用“新窗口打开”。',
         integrationDoc: '支付集成文档',
-        integrationDocHint: '包含接口说明、幂等语义及示例代码'
+        integrationDocHint: '包含接口说明、幂等语义及示例代码',
+        instructions: '购买说明',
+        instructionsPlaceholder: '填写付款方式、备注要求等说明',
+        instructionsHint: '展示在购买页面，支持 HTML 内容。'
+      },
+      payment: {
+        title: '在线支付设置',
+        description: '配置订阅订单的在线支付渠道',
+        provider: '支付方式',
+        providerManual: '线下手动',
+        providerXunhu: '虎皮椒',
+        xunhuAppId: '虎皮椒 AppID',
+        xunhuAppIdPlaceholder: '填写 AppID',
+        xunhuAppSecret: '虎皮椒 AppSecret',
+        secretPlaceholder: '填写 AppSecret',
+        secretConfigured: '********（已配置）',
+        secretHint: '留空保持现有密钥',
+        xunhuGateway: '支付网关地址',
+        xunhuGatewayPlaceholder: 'https://api.xunhupay.com/payment/do.html',
+        xunhuNotifyUrl: '回调地址（notify_url）',
+        xunhuNotifyUrlPlaceholder: 'https://your-domain.com/api/v1/payment/xunhupay/notify',
+        notifyHint: '需公网可访问（可用内网穿透），用于支付回调',
+        xunhuReturnUrl: '跳转地址（return_url）',
+        xunhuReturnUrlPlaceholder: 'https://your-domain.com/purchase',
+        xunhuPlugins: '支付渠道（plugins）',
+        xunhuPluginsPlaceholder: 'wechat,alipay（可选）',
+        pluginsHint: '留空由虎皮椒默认选择'
       },
       soraClient: {
         title: 'Sora 客户端',
@@ -4261,13 +4287,44 @@ export default {
 
   // Recharge / Subscription Page
   purchase: {
-    title: '充值/订阅',
-    description: '通过内嵌页面完成充值/订阅',
+    title: '购买订阅',
+    description: '选择套餐并下单，完成支付后订阅将开通。',
     openInNewTab: '新窗口打开',
     notEnabledTitle: '该功能未开启',
-    notEnabledDesc: '管理员暂未开启充值/订阅入口，请联系管理员。',
-    notConfiguredTitle: '充值/订阅链接未配置',
-    notConfiguredDesc: '管理员已开启入口，但尚未配置充值/订阅链接，请联系管理员。'
+    notEnabledDesc: '管理员暂未开启购买订阅入口，请联系管理员。',
+    notConfiguredTitle: '购买链接未配置',
+    notConfiguredDesc: '管理员已开启入口，但尚未配置购买订阅链接，请联系管理员。',
+    plans: '可购买套餐',
+    orders: '我的订单',
+    noPlans: '暂无可购买套餐',
+    noOrders: '暂无订单',
+    createOrder: '创建订单',
+    creating: '正在创建...',
+    loadPlansFailed: '加载套餐失败',
+    loadOrdersFailed: '加载订单失败',
+    createOrderFailed: '创建订单失败',
+    orderCreated: '订单已创建，订阅已开通。',
+    orderCreatedPending: '订单已创建，请完成支付。',
+    dailyLimit: '日限额',
+    weeklyLimit: '周限额',
+    monthlyLimit: '月限额',
+    unlimited: '无限制',
+    days: '天',
+    subscription: '订阅',
+    columns: {
+      orderNo: '订单号',
+      plan: '套餐',
+      amount: '金额',
+      status: '状态',
+      createdAt: '创建时间',
+      actions: '操作'
+    },
+    payNow: '立即支付',
+    orderStatus: {
+      pending: '待支付',
+      paid: '已支付',
+      canceled: '已取消'
+    }
   },
 
   // Custom Page (iframe embed)

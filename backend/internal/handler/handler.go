@@ -28,6 +28,7 @@ type AdminHandlers struct {
 	ErrorPassthrough *admin.ErrorPassthroughHandler
 	APIKey           *admin.AdminAPIKeyHandler
 	ScheduledTest    *admin.ScheduledTestHandler
+	Order            *admin.OrderHandler
 }
 
 // Handlers contains all HTTP handlers
@@ -39,6 +40,8 @@ type Handlers struct {
 	Redeem        *RedeemHandler
 	Subscription  *SubscriptionHandler
 	Announcement  *AnnouncementHandler
+	Purchase      *PurchaseHandler
+	Payment       *PaymentHandler
 	Admin         *AdminHandlers
 	Gateway       *GatewayHandler
 	OpenAIGateway *OpenAIGatewayHandler

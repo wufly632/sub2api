@@ -53,6 +53,14 @@ type SystemSettings struct {
 	HideCcsImportButton         bool             `json:"hide_ccs_import_button"`
 	PurchaseSubscriptionEnabled bool             `json:"purchase_subscription_enabled"`
 	PurchaseSubscriptionURL     string           `json:"purchase_subscription_url"`
+	PurchaseInstructions        string           `json:"purchase_instructions"`
+	PaymentProvider             string           `json:"payment_provider"`
+	XunhuPayAppID               string           `json:"xunhupay_appid"`
+	XunhuPayAppSecretConfigured bool             `json:"xunhupay_appsecret_configured"`
+	XunhuPayGateway             string           `json:"xunhupay_gateway"`
+	XunhuPayNotifyURL           string           `json:"xunhupay_notify_url"`
+	XunhuPayReturnURL           string           `json:"xunhupay_return_url"`
+	XunhuPayPlugins             string           `json:"xunhupay_plugins"`
 	SoraClientEnabled           bool             `json:"sora_client_enabled"`
 	CustomMenuItems             []CustomMenuItem `json:"custom_menu_items"`
 
@@ -108,6 +116,7 @@ type PublicSettings struct {
 	HideCcsImportButton              bool             `json:"hide_ccs_import_button"`
 	PurchaseSubscriptionEnabled      bool             `json:"purchase_subscription_enabled"`
 	PurchaseSubscriptionURL          string           `json:"purchase_subscription_url"`
+	PurchaseInstructions             string           `json:"purchase_instructions"`
 	CustomMenuItems                  []CustomMenuItem `json:"custom_menu_items"`
 	LinuxDoOAuthEnabled              bool             `json:"linuxdo_oauth_enabled"`
 	SoraClientEnabled                bool             `json:"sora_client_enabled"`

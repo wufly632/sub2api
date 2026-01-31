@@ -41,6 +41,14 @@ export interface SystemSettings {
   purchase_subscription_url: string
   sora_client_enabled: boolean
   custom_menu_items: CustomMenuItem[]
+  purchase_instructions: string
+  payment_provider: string
+  xunhupay_appid: string
+  xunhupay_appsecret_configured: boolean
+  xunhupay_gateway: string
+  xunhupay_notify_url: string
+  xunhupay_return_url: string
+  xunhupay_plugins: string
   // SMTP settings
   smtp_host: string
   smtp_port: number
@@ -107,6 +115,14 @@ export interface UpdateSettingsRequest {
   purchase_subscription_url?: string
   sora_client_enabled?: boolean
   custom_menu_items?: CustomMenuItem[]
+  purchase_instructions?: string
+  payment_provider?: string
+  xunhupay_appid?: string
+  xunhupay_appsecret?: string
+  xunhupay_gateway?: string
+  xunhupay_notify_url?: string
+  xunhupay_return_url?: string
+  xunhupay_plugins?: string
   smtp_host?: string
   smtp_port?: number
   smtp_username?: string

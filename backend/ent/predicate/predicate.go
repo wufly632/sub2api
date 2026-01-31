@@ -48,6 +48,9 @@ type SecuritySecret func(*sql.Selector)
 // Setting is the predicate function for setting builders.
 type Setting func(*sql.Selector)
 
+// SubscriptionOrder is the predicate function for subscriptionorder builders.
+type SubscriptionOrder func(*sql.Selector)
+
 // UsageCleanupTask is the predicate function for usagecleanuptask builders.
 type UsageCleanupTask func(*sql.Selector)
 

@@ -20,6 +20,9 @@ type Group struct {
 	WeeklyLimitUSD      *float64
 	MonthlyLimitUSD     *float64
 	DefaultValidityDays int
+	PurchaseEnabled     bool
+	PurchasePrice       *float64
+	PurchaseDisplayOrder int
 
 	// 图片生成计费配置（antigravity 和 gemini 平台使用）
 	ImagePrice1K *float64

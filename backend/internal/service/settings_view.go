@@ -42,6 +42,15 @@ type SystemSettings struct {
 	PurchaseSubscriptionURL     string
 	SoraClientEnabled           bool
 	CustomMenuItems             string // JSON array of custom menu items
+	PurchaseInstructions        string
+	PaymentProvider             string
+	XunhuPayAppID               string
+	XunhuPayAppSecret           string
+	XunhuPayAppSecretConfigured bool
+	XunhuPayGateway             string
+	XunhuPayNotifyURL           string
+	XunhuPayReturnURL           string
+	XunhuPayPlugins             string
 
 	DefaultConcurrency   int
 	DefaultBalance       float64
@@ -99,7 +108,7 @@ type PublicSettings struct {
 	PurchaseSubscriptionURL     string
 	SoraClientEnabled           bool
 	CustomMenuItems             string // JSON array of custom menu items
-
+	PurchaseInstructions        string
 	LinuxDoOAuthEnabled bool
 	Version             string
 }
