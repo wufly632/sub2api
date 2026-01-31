@@ -16,15 +16,15 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-GITHUB_REPO="Wei-Shaw/sub2api"
-INSTALL_DIR="/opt/sub2api"
-SERVICE_NAME="sub2api"
+GITHUB_REPO="wufly632/sub2api"
+INSTALL_DIR="/opt/sub2api-wufly"
+SERVICE_NAME="sub2api-wufly"
 SERVICE_USER="sub2api"
-CONFIG_DIR="/etc/sub2api"
+CONFIG_DIR="/etc/sub2api-wufly"
 
 # Server configuration (will be set by user)
 SERVER_HOST="0.0.0.0"
-SERVER_PORT="8080"
+SERVER_PORT="8081"
 
 # Language (default: zh = Chinese)
 LANG_CHOICE="zh"
