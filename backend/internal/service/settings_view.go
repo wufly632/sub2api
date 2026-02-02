@@ -109,8 +109,8 @@ type PublicSettings struct {
 	SoraClientEnabled           bool
 	CustomMenuItems             string // JSON array of custom menu items
 	PurchaseInstructions        string
-	LinuxDoOAuthEnabled bool
-	Version             string
+	LinuxDoOAuthEnabled         bool
+	Version                     string
 }
 
 // SoraS3Settings Sora S3 存储配置

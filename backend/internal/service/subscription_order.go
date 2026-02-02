@@ -8,26 +8,26 @@ import (
 
 // SubscriptionOrder represents a purchase order for a subscription plan.
 type SubscriptionOrder struct {
-	ID             int64
-	OrderNo        string
-	UserID         int64
-	GroupID        int64
-	SubscriptionID *int64
-	PaymentProvider     string
-	PaymentURL          string
-	PaymentQRCode       string
-	PaymentOpenOrderID  string
+	ID                   int64
+	OrderNo              string
+	UserID               int64
+	GroupID              int64
+	SubscriptionID       *int64
+	PaymentProvider      string
+	PaymentURL           string
+	PaymentQRCode        string
+	PaymentOpenOrderID   string
 	PaymentTransactionID string
-	PaymentPlugin       string
-	Status         string
-	Amount         float64
-	Currency       string
-	ValidityDays   int
-	PaidAt         *time.Time
-	CanceledAt     *time.Time
-	Notes          string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	PaymentPlugin        string
+	Status               string
+	Amount               float64
+	Currency             string
+	ValidityDays         int
+	PaidAt               *time.Time
+	CanceledAt           *time.Time
+	Notes                string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 
 	User         *User
 	Group        *Group
