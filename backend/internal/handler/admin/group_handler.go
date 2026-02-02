@@ -25,19 +25,19 @@ func NewGroupHandler(adminService service.AdminService) *GroupHandler {
 
 // CreateGroupRequest represents create group request
 type CreateGroupRequest struct {
-	Name             string   `json:"name" binding:"required"`
-	Description      string   `json:"description"`
-	Platform         string   `json:"platform" binding:"omitempty,oneof=anthropic openai gemini antigravity"`
-	RateMultiplier   float64  `json:"rate_multiplier"`
-	IsExclusive      bool     `json:"is_exclusive"`
-	SubscriptionType string   `json:"subscription_type" binding:"omitempty,oneof=standard subscription"`
-	DailyLimitUSD    *float64 `json:"daily_limit_usd"`
-	WeeklyLimitUSD   *float64 `json:"weekly_limit_usd"`
-	MonthlyLimitUSD  *float64 `json:"monthly_limit_usd"`
-	DefaultValidityDays int   `json:"default_validity_days"`
-	PurchaseEnabled  bool     `json:"purchase_enabled"`
-	PurchasePrice    *float64 `json:"purchase_price"`
-	PurchaseDisplayOrder int  `json:"purchase_display_order"`
+	Name                 string   `json:"name" binding:"required"`
+	Description          string   `json:"description"`
+	Platform             string   `json:"platform" binding:"omitempty,oneof=anthropic openai gemini antigravity"`
+	RateMultiplier       float64  `json:"rate_multiplier"`
+	IsExclusive          bool     `json:"is_exclusive"`
+	SubscriptionType     string   `json:"subscription_type" binding:"omitempty,oneof=standard subscription"`
+	DailyLimitUSD        *float64 `json:"daily_limit_usd"`
+	WeeklyLimitUSD       *float64 `json:"weekly_limit_usd"`
+	MonthlyLimitUSD      *float64 `json:"monthly_limit_usd"`
+	DefaultValidityDays  int      `json:"default_validity_days"`
+	PurchaseEnabled      bool     `json:"purchase_enabled"`
+	PurchasePrice        *float64 `json:"purchase_price"`
+	PurchaseDisplayOrder int      `json:"purchase_display_order"`
 	// 图片生成计费配置（antigravity 和 gemini 平台使用，负数表示清除配置）
 	ImagePrice1K                    *float64 `json:"image_price_1k"`
 	ImagePrice2K                    *float64 `json:"image_price_2k"`
@@ -57,20 +57,20 @@ type CreateGroupRequest struct {
 
 // UpdateGroupRequest represents update group request
 type UpdateGroupRequest struct {
-	Name             string   `json:"name"`
-	Description      string   `json:"description"`
-	Platform         string   `json:"platform" binding:"omitempty,oneof=anthropic openai gemini antigravity"`
-	RateMultiplier   *float64 `json:"rate_multiplier"`
-	IsExclusive      *bool    `json:"is_exclusive"`
-	Status           string   `json:"status" binding:"omitempty,oneof=active inactive"`
-	SubscriptionType string   `json:"subscription_type" binding:"omitempty,oneof=standard subscription"`
-	DailyLimitUSD    *float64 `json:"daily_limit_usd"`
-	WeeklyLimitUSD   *float64 `json:"weekly_limit_usd"`
-	MonthlyLimitUSD  *float64 `json:"monthly_limit_usd"`
-	DefaultValidityDays *int  `json:"default_validity_days"`
-	PurchaseEnabled  *bool    `json:"purchase_enabled"`
-	PurchasePrice    *float64 `json:"purchase_price"`
-	PurchaseDisplayOrder *int `json:"purchase_display_order"`
+	Name                 string   `json:"name"`
+	Description          string   `json:"description"`
+	Platform             string   `json:"platform" binding:"omitempty,oneof=anthropic openai gemini antigravity"`
+	RateMultiplier       *float64 `json:"rate_multiplier"`
+	IsExclusive          *bool    `json:"is_exclusive"`
+	Status               string   `json:"status" binding:"omitempty,oneof=active inactive"`
+	SubscriptionType     string   `json:"subscription_type" binding:"omitempty,oneof=standard subscription"`
+	DailyLimitUSD        *float64 `json:"daily_limit_usd"`
+	WeeklyLimitUSD       *float64 `json:"weekly_limit_usd"`
+	MonthlyLimitUSD      *float64 `json:"monthly_limit_usd"`
+	DefaultValidityDays  *int     `json:"default_validity_days"`
+	PurchaseEnabled      *bool    `json:"purchase_enabled"`
+	PurchasePrice        *float64 `json:"purchase_price"`
+	PurchaseDisplayOrder *int     `json:"purchase_display_order"`
 	// 图片生成计费配置（antigravity 和 gemini 平台使用，负数表示清除配置）
 	ImagePrice1K                    *float64 `json:"image_price_1k"`
 	ImagePrice2K                    *float64 `json:"image_price_2k"`

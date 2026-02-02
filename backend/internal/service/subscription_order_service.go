@@ -15,13 +15,13 @@ import (
 )
 
 var (
-	ErrOrderNotFound      = infraerrors.NotFound("ORDER_NOT_FOUND", "order not found")
-	ErrOrderInvalidStatus = infraerrors.BadRequest("ORDER_INVALID_STATUS", "order status invalid")
-	ErrOrderInvalidPlan   = infraerrors.BadRequest("ORDER_INVALID_PLAN", "invalid purchase plan")
-	ErrOrderNilInput      = infraerrors.BadRequest("ORDER_NIL_INPUT", "order input cannot be nil")
-	ErrPaymentNotConfigured  = infraerrors.BadRequest("PAYMENT_NOT_CONFIGURED", "payment provider not configured")
+	ErrOrderNotFound           = infraerrors.NotFound("ORDER_NOT_FOUND", "order not found")
+	ErrOrderInvalidStatus      = infraerrors.BadRequest("ORDER_INVALID_STATUS", "order status invalid")
+	ErrOrderInvalidPlan        = infraerrors.BadRequest("ORDER_INVALID_PLAN", "invalid purchase plan")
+	ErrOrderNilInput           = infraerrors.BadRequest("ORDER_NIL_INPUT", "order input cannot be nil")
+	ErrPaymentNotConfigured    = infraerrors.BadRequest("PAYMENT_NOT_CONFIGURED", "payment provider not configured")
 	ErrPaymentInvalidSignature = infraerrors.BadRequest("PAYMENT_INVALID_SIGNATURE", "payment signature invalid")
-	ErrPaymentAmountMismatch = infraerrors.BadRequest("PAYMENT_AMOUNT_MISMATCH", "payment amount mismatch")
+	ErrPaymentAmountMismatch   = infraerrors.BadRequest("PAYMENT_AMOUNT_MISMATCH", "payment amount mismatch")
 )
 
 const orderPaymentTimeout = 5 * time.Minute
@@ -33,7 +33,7 @@ type SubscriptionOrderService struct {
 	orderRepo           SubscriptionOrderRepository
 	subscriptionService *SubscriptionService
 	settingService      *SettingService
-	xunhuPayClient       *XunhuPayClient
+	xunhuPayClient      *XunhuPayClient
 }
 
 // NewSubscriptionOrderService creates a new order service.
@@ -51,7 +51,7 @@ func NewSubscriptionOrderService(
 		orderRepo:           orderRepo,
 		subscriptionService: subscriptionService,
 		settingService:      settingService,
-		xunhuPayClient:       xunhuPayClient,
+		xunhuPayClient:      xunhuPayClient,
 	}
 }
 
@@ -83,15 +83,15 @@ func (s *SubscriptionOrderService) CreateOrder(ctx context.Context, userID, grou
 		return nil, err
 	}
 	order := &SubscriptionOrder{
-		OrderNo:      orderNo,
-		UserID:       userID,
-		GroupID:      groupID,
+		OrderNo:         orderNo,
+		UserID:          userID,
+		GroupID:         groupID,
 		PaymentProvider: paymentProvider,
-		Status:       OrderStatusPending,
-		Amount:       amount,
-		Currency:     CurrencyCNY,
-		ValidityDays: validityDays,
-		Notes:        notes,
+		Status:          OrderStatusPending,
+		Amount:          amount,
+		Currency:        CurrencyCNY,
+		ValidityDays:    validityDays,
+		Notes:           notes,
 	}
 
 	if err := s.orderRepo.Create(ctx, order); err != nil {

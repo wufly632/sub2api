@@ -102,7 +102,11 @@ func (c *XunhuPayClient) CreatePayment(ctx context.Context, cfg XunhuPayConfig, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			log.Printf("xunhupay response body close error: %v", cerr)
+		}
+	}()
 
 	var raw map[string]any
 	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
@@ -186,13 +190,13 @@ func xunhuPaySign(params map[string]string, appSecret string) string {
 	var builder strings.Builder
 	for i, key := range keys {
 		if i > 0 {
-			builder.WriteString("&")
+			_, _ = builder.WriteString("&")
 		}
-		builder.WriteString(key)
-		builder.WriteString("=")
-		builder.WriteString(params[key])
+		_, _ = builder.WriteString(key)
+		_, _ = builder.WriteString("=")
+		_, _ = builder.WriteString(params[key])
 	}
-	builder.WriteString(appSecret)
+	_, _ = builder.WriteString(appSecret)
 	sum := md5.Sum([]byte(builder.String()))
 	return hex.EncodeToString(sum[:])
 }

@@ -100,18 +100,18 @@ type UpdateUserInput struct {
 }
 
 type CreateGroupInput struct {
-	Name             string
-	Description      string
-	Platform         string
-	RateMultiplier   float64
-	IsExclusive      bool
-	SubscriptionType string   // standard/subscription
-	DailyLimitUSD    *float64 // 日限额 (USD)
-	WeeklyLimitUSD   *float64 // 周限额 (USD)
-	MonthlyLimitUSD  *float64 // 月限额 (USD)
-	DefaultValidityDays int
-	PurchaseEnabled  bool
-	PurchasePrice    *float64
+	Name                 string
+	Description          string
+	Platform             string
+	RateMultiplier       float64
+	IsExclusive          bool
+	SubscriptionType     string   // standard/subscription
+	DailyLimitUSD        *float64 // 日限额 (USD)
+	WeeklyLimitUSD       *float64 // 周限额 (USD)
+	MonthlyLimitUSD      *float64 // 月限额 (USD)
+	DefaultValidityDays  int
+	PurchaseEnabled      bool
+	PurchasePrice        *float64
 	PurchaseDisplayOrder int
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	ImagePrice1K    *float64
@@ -132,19 +132,19 @@ type CreateGroupInput struct {
 }
 
 type UpdateGroupInput struct {
-	Name             string
-	Description      string
-	Platform         string
-	RateMultiplier   *float64 // 使用指针以支持设置为0
-	IsExclusive      *bool
-	Status           string
-	SubscriptionType string   // standard/subscription
-	DailyLimitUSD    *float64 // 日限额 (USD)
-	WeeklyLimitUSD   *float64 // 周限额 (USD)
-	MonthlyLimitUSD  *float64 // 月限额 (USD)
-	DefaultValidityDays *int
-	PurchaseEnabled  *bool
-	PurchasePrice    *float64
+	Name                 string
+	Description          string
+	Platform             string
+	RateMultiplier       *float64 // 使用指针以支持设置为0
+	IsExclusive          *bool
+	Status               string
+	SubscriptionType     string   // standard/subscription
+	DailyLimitUSD        *float64 // 日限额 (USD)
+	WeeklyLimitUSD       *float64 // 周限额 (USD)
+	MonthlyLimitUSD      *float64 // 月限额 (USD)
+	DefaultValidityDays  *int
+	PurchaseEnabled      *bool
+	PurchasePrice        *float64
 	PurchaseDisplayOrder *int
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	ImagePrice1K    *float64

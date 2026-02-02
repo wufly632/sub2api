@@ -91,8 +91,8 @@ type PublicSettings struct {
 	PurchaseSubscriptionEnabled bool
 	PurchaseSubscriptionURL     string
 	PurchaseInstructions        string
-	LinuxDoOAuthEnabled bool
-	Version             string
+	LinuxDoOAuthEnabled         bool
+	Version                     string
 }
 
 // StreamTimeoutSettings 流超时处理配置（仅控制超时后的处理方式，超时判定由网关配置控制）
