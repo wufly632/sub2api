@@ -2,7 +2,6 @@ package schema
 
 import (
 	"github.com/Wei-Shaw/sub2api/ent/schema/mixins"
-	"github.com/Wei-Shaw/sub2api/internal/service"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -66,13 +65,13 @@ func (SubscriptionOrder) Fields() []ent.Field {
 			MaxLen(32),
 		field.String("status").
 			MaxLen(20).
-			Default(service.OrderStatusPending),
+			Default("pending"),
 		field.Float("amount").
 			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
 			Default(0),
 		field.String("currency").
 			MaxLen(10).
-			Default(service.CurrencyCNY),
+			Default("CNY"),
 		field.Int("validity_days").
 			Default(30),
 		field.Time("paid_at").
