@@ -18,8 +18,6 @@ export { userGroupsAPI } from './groups'
 export { totpAPI } from './totp'
 export { default as announcementsAPI } from './announcements'
 export { purchaseAPI } from './purchase'
-export { default as announcementsAPI } from './announcements'
-export { purchaseAPI } from './purchase'
 
 // Admin APIs
 export { adminAPI } from './admin'
