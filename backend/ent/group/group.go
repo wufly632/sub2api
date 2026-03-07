@@ -43,6 +43,12 @@ const (
 	FieldMonthlyLimitUsd = "monthly_limit_usd"
 	// FieldDefaultValidityDays holds the string denoting the default_validity_days field in the database.
 	FieldDefaultValidityDays = "default_validity_days"
+	// FieldPurchaseEnabled holds the string denoting the purchase_enabled field in the database.
+	FieldPurchaseEnabled = "purchase_enabled"
+	// FieldPurchasePrice holds the string denoting the purchase_price field in the database.
+	FieldPurchasePrice = "purchase_price"
+	// FieldPurchaseDisplayOrder holds the string denoting the purchase_display_order field in the database.
+	FieldPurchaseDisplayOrder = "purchase_display_order"
 	// FieldImagePrice1k holds the string denoting the image_price_1k field in the database.
 	FieldImagePrice1k = "image_price_1k"
 	// FieldImagePrice2k holds the string denoting the image_price_2k field in the database.
@@ -81,6 +87,8 @@ const (
 	EdgeRedeemCodes = "redeem_codes"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
 	EdgeSubscriptions = "subscriptions"
+	// EdgeSubscriptionOrders holds the string denoting the subscription_orders edge name in mutations.
+	EdgeSubscriptionOrders = "subscription_orders"
 	// EdgeUsageLogs holds the string denoting the usage_logs edge name in mutations.
 	EdgeUsageLogs = "usage_logs"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
@@ -114,6 +122,13 @@ const (
 	SubscriptionsInverseTable = "user_subscriptions"
 	// SubscriptionsColumn is the table column denoting the subscriptions relation/edge.
 	SubscriptionsColumn = "group_id"
+	// SubscriptionOrdersTable is the table that holds the subscription_orders relation/edge.
+	SubscriptionOrdersTable = "subscription_orders"
+	// SubscriptionOrdersInverseTable is the table name for the SubscriptionOrder entity.
+	// It exists in this package in order to avoid circular dependency with the "subscriptionorder" package.
+	SubscriptionOrdersInverseTable = "subscription_orders"
+	// SubscriptionOrdersColumn is the table column denoting the subscription_orders relation/edge.
+	SubscriptionOrdersColumn = "group_id"
 	// UsageLogsTable is the table that holds the usage_logs relation/edge.
 	UsageLogsTable = "usage_logs"
 	// UsageLogsInverseTable is the table name for the UsageLog entity.
@@ -164,6 +179,9 @@ var Columns = []string{
 	FieldWeeklyLimitUsd,
 	FieldMonthlyLimitUsd,
 	FieldDefaultValidityDays,
+	FieldPurchaseEnabled,
+	FieldPurchasePrice,
+	FieldPurchaseDisplayOrder,
 	FieldImagePrice1k,
 	FieldImagePrice2k,
 	FieldImagePrice4k,
@@ -235,6 +253,10 @@ var (
 	SubscriptionTypeValidator func(string) error
 	// DefaultDefaultValidityDays holds the default value on creation for the "default_validity_days" field.
 	DefaultDefaultValidityDays int
+	// DefaultPurchaseEnabled holds the default value on creation for the "purchase_enabled" field.
+	DefaultPurchaseEnabled bool
+	// DefaultPurchaseDisplayOrder holds the default value on creation for the "purchase_display_order" field.
+	DefaultPurchaseDisplayOrder int
 	// DefaultSoraStorageQuotaBytes holds the default value on creation for the "sora_storage_quota_bytes" field.
 	DefaultSoraStorageQuotaBytes int64
 	// DefaultClaudeCodeOnly holds the default value on creation for the "claude_code_only" field.
@@ -325,6 +347,21 @@ func ByMonthlyLimitUsd(opts ...sql.OrderTermOption) OrderOption {
 // ByDefaultValidityDays orders the results by the default_validity_days field.
 func ByDefaultValidityDays(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDefaultValidityDays, opts...).ToFunc()
+}
+
+// ByPurchaseEnabled orders the results by the purchase_enabled field.
+func ByPurchaseEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPurchaseEnabled, opts...).ToFunc()
+}
+
+// ByPurchasePrice orders the results by the purchase_price field.
+func ByPurchasePrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPurchasePrice, opts...).ToFunc()
+}
+
+// ByPurchaseDisplayOrder orders the results by the purchase_display_order field.
+func ByPurchaseDisplayOrder(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPurchaseDisplayOrder, opts...).ToFunc()
 }
 
 // ByImagePrice1k orders the results by the image_price_1k field.
@@ -439,6 +476,20 @@ func BySubscriptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// BySubscriptionOrdersCount orders the results by subscription_orders count.
+func BySubscriptionOrdersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscriptionOrdersStep(), opts...)
+	}
+}
+
+// BySubscriptionOrders orders the results by subscription_orders terms.
+func BySubscriptionOrders(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscriptionOrdersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUsageLogsCount orders the results by usage_logs count.
 func ByUsageLogsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -527,6 +578,13 @@ func newSubscriptionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubscriptionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubscriptionsTable, SubscriptionsColumn),
+	)
+}
+func newSubscriptionOrdersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscriptionOrdersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubscriptionOrdersTable, SubscriptionOrdersColumn),
 	)
 }
 func newUsageLogsStep() *sqlgraph.Step {
