@@ -462,6 +462,10 @@ func (s *groupRepoStubForInvalidRequestFallback) ListActiveByPlatform(_ context.
 	panic("unexpected ListActiveByPlatform call")
 }
 
+func (s *groupRepoStubForInvalidRequestFallback) ListPurchasePlans(_ context.Context) ([]Group, error) {
+	panic("unexpected ListPurchasePlans call")
+}
+
 func (s *groupRepoStubForInvalidRequestFallback) ExistsByName(_ context.Context, _ string) (bool, error) {
 	panic("unexpected ExistsByName call")
 }

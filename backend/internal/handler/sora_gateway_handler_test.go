@@ -270,6 +270,9 @@ func (r *stubGroupRepo) ListActive(ctx context.Context) ([]service.Group, error)
 func (r *stubGroupRepo) ListActiveByPlatform(ctx context.Context, platform string) ([]service.Group, error) {
 	return nil, nil
 }
+func (r *stubGroupRepo) ListPurchasePlans(ctx context.Context) ([]service.Group, error) {
+	return nil, nil
+}
 func (r *stubGroupRepo) ExistsByName(ctx context.Context, name string) (bool, error) {
 	return false, nil
 }

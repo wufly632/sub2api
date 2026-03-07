@@ -37,6 +37,9 @@ func (groupRepoNoop) ListActive(context.Context) ([]Group, error) {
 func (groupRepoNoop) ListActiveByPlatform(context.Context, string) ([]Group, error) {
 	panic("unexpected ListActiveByPlatform call")
 }
+func (groupRepoNoop) ListPurchasePlans(context.Context) ([]Group, error) {
+	panic("unexpected ListPurchasePlans call")
+}
 func (groupRepoNoop) ExistsByName(context.Context, string) (bool, error) {
 	panic("unexpected ExistsByName call")
 }

@@ -175,6 +175,9 @@ func (s *groupRepoStubForGroupUpdate) ListActive(context.Context) ([]Group, erro
 func (s *groupRepoStubForGroupUpdate) ListActiveByPlatform(context.Context, string) ([]Group, error) {
 	panic("unexpected")
 }
+func (s *groupRepoStubForGroupUpdate) ListPurchasePlans(context.Context) ([]Group, error) {
+	panic("unexpected")
+}
 func (s *groupRepoStubForGroupUpdate) ExistsByName(context.Context, string) (bool, error) {
 	panic("unexpected")
 }

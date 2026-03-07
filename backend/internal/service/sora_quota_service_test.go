@@ -49,6 +49,9 @@ func (r *stubGroupRepoForQuota) ListActive(context.Context) ([]Group, error) { r
 func (r *stubGroupRepoForQuota) ListActiveByPlatform(context.Context, string) ([]Group, error) {
 	return nil, nil
 }
+func (r *stubGroupRepoForQuota) ListPurchasePlans(context.Context) ([]Group, error) {
+	return nil, nil
+}
 func (r *stubGroupRepoForQuota) ExistsByName(context.Context, string) (bool, error) {
 	return false, nil
 }
