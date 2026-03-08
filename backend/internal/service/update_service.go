@@ -511,30 +511,55 @@ func (s *UpdateService) saveToCache(ctx context.Context, info *UpdateInfo) {
 	_ = s.cache.SetUpdateInfo(ctx, string(data), time.Duration(updateCacheTTL)*time.Second)
 }
 
-// compareVersions compares two semantic versions
+// compareVersions compares two dotted numeric versions (e.g. 0.1.91.2).
+// It supports different segment lengths and treats missing segments as zero.
 func compareVersions(current, latest string) int {
 	currentParts := parseVersion(current)
 	latestParts := parseVersion(latest)
 
-	for i := 0; i < 3; i++ {
-		if currentParts[i] < latestParts[i] {
+	maxLen := len(currentParts)
+	if len(latestParts) > maxLen {
+		maxLen = len(latestParts)
+	}
+
+	for i := 0; i < maxLen; i++ {
+		currentPart := 0
+		if i < len(currentParts) {
+			currentPart = currentParts[i]
+		}
+		latestPart := 0
+		if i < len(latestParts) {
+			latestPart = latestParts[i]
+		}
+
+		if currentPart < latestPart {
 			return -1
 		}
-		if currentParts[i] > latestParts[i] {
+		if currentPart > latestPart {
 			return 1
 		}
 	}
 	return 0
 }
 
-func parseVersion(v string) [3]int {
+func parseVersion(v string) []int {
 	v = strings.TrimPrefix(v, "v")
 	parts := strings.Split(v, ".")
-	result := [3]int{0, 0, 0}
-	for i := 0; i < len(parts) && i < 3; i++ {
-		if parsed, err := strconv.Atoi(parts[i]); err == nil {
-			result[i] = parsed
+	result := make([]int, 0, len(parts))
+	for _, part := range parts {
+		value := 0
+		for i, ch := range part {
+			if ch < '0' || ch > '9' {
+				part = part[:i]
+				break
+			}
 		}
+		if part != "" {
+			if parsed, err := strconv.Atoi(part); err == nil {
+				value = parsed
+			}
+		}
+		result = append(result, value)
 	}
 	return result
 }
