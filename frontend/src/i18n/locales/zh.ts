@@ -334,6 +334,7 @@ export default {
     users: '用户管理',
     groups: '分组管理',
     subscriptions: '订阅管理',
+    orders: '订单管理',
     accounts: '账号管理',
     proxies: 'IP管理',
     redeemCodes: '兑换码',
@@ -1657,6 +1658,43 @@ export default {
       pleaseSelectGroup: '请选择分组',
       validityDaysRequired: '请输入有效的天数（至少1天）',
       revokeConfirm: "确定要撤销 '{user}' 的订阅吗？此操作无法撤销。"
+    },
+
+    // Orders
+    orders: {
+      title: '订单管理',
+      description: '管理订阅购买订单',
+      allStatus: '全部状态',
+      searchOrderNo: '搜索订单号',
+      filterUserId: '用户 ID',
+      filterGroupId: '分组 ID',
+      markPaid: '标记已支付',
+      cancel: '取消',
+      days: '天',
+      loadFailed: '加载订单失败',
+      actionFailed: '操作失败',
+      markPaidSuccess: '订单已标记为已支付',
+      cancelSuccess: '订单已取消',
+      confirmPaidTitle: '确认支付',
+      confirmPaidMessage: '确认将订单 {orderNo} 标记为已支付？',
+      confirmCancelTitle: '确认取消',
+      confirmCancelMessage: '确认取消订单 {orderNo}？',
+      status: {
+        pending: '待支付',
+        paid: '已支付',
+        canceled: '已取消'
+      },
+      columns: {
+        orderNo: '订单号',
+        user: '用户',
+        group: '套餐',
+        amount: '金额',
+        validity: '有效期',
+        status: '状态',
+        createdAt: '创建时间',
+        paidAt: '支付时间',
+        actions: '操作'
+      }
     },
 
     // Accounts Management
