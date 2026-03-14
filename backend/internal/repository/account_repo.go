@@ -433,7 +433,7 @@ func (r *accountRepository) List(ctx context.Context, params pagination.Paginati
 }
 
 func (r *accountRepository) ListWithFilters(ctx context.Context, params pagination.PaginationParams, platform, accountType, status, search string, groupID int64) ([]service.Account, *pagination.PaginationResult, error) {
-	q := r.client.Account.Query()
+	q := r.client.Account.Query().Where(dbaccount.DeletedAtIsNil())
 
 	if platform != "" {
 		q = q.Where(dbaccount.PlatformEQ(platform))

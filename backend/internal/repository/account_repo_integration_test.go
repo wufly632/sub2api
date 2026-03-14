@@ -167,6 +167,27 @@ func (s *AccountRepoSuite) TestList() {
 	s.Require().Equal(int64(2), page.Total)
 }
 
+func (s *AccountRepoSuite) TestListWithFilters_ExcludeSoftDeleted() {
+	keep := mustCreateAccount(s.T(), s.client, &service.Account{Name: "keep-account"})
+	removed := mustCreateAccount(s.T(), s.client, &service.Account{Name: "removed-account"})
+
+	s.Require().NoError(s.repo.Delete(s.ctx, removed.ID))
+
+	accounts, page, err := s.repo.ListWithFilters(
+		s.ctx,
+		pagination.PaginationParams{Page: 1, PageSize: 10},
+		"",
+		"",
+		"",
+		"",
+		0,
+	)
+	s.Require().NoError(err)
+	s.Require().Len(accounts, 1)
+	s.Require().Equal(int64(1), page.Total)
+	s.Require().Equal(keep.ID, accounts[0].ID)
+}
+
 func (s *AccountRepoSuite) TestListWithFilters() {
 	tests := []struct {
 		name      string

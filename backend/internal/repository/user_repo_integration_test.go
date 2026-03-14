@@ -162,6 +162,23 @@ func (s *UserRepoSuite) TestList() {
 	s.Require().Equal(int64(2), page.Total)
 }
 
+func (s *UserRepoSuite) TestListWithFilters_ExcludeSoftDeleted() {
+	keep := s.mustCreateUser(&service.User{Email: "keep-list@test.com"})
+	removed := s.mustCreateUser(&service.User{Email: "removed-list@test.com"})
+
+	s.Require().NoError(s.repo.Delete(s.ctx, removed.ID))
+
+	users, page, err := s.repo.ListWithFilters(
+		s.ctx,
+		pagination.PaginationParams{Page: 1, PageSize: 10},
+		service.UserListFilters{},
+	)
+	s.Require().NoError(err)
+	s.Require().Len(users, 1)
+	s.Require().Equal(int64(1), page.Total)
+	s.Require().Equal(keep.ID, users[0].ID)
+}
+
 func (s *UserRepoSuite) TestListWithFilters_Status() {
 	s.mustCreateUser(&service.User{Email: "active@test.com", Status: service.StatusActive})
 	s.mustCreateUser(&service.User{Email: "disabled@test.com", Status: service.StatusDisabled})

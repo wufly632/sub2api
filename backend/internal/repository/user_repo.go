@@ -181,7 +181,7 @@ func (r *userRepository) List(ctx context.Context, params pagination.PaginationP
 }
 
 func (r *userRepository) ListWithFilters(ctx context.Context, params pagination.PaginationParams, filters service.UserListFilters) ([]service.User, *pagination.PaginationResult, error) {
-	q := r.client.User.Query()
+	q := r.client.User.Query().Where(dbuser.DeletedAtIsNil())
 
 	if filters.Status != "" {
 		q = q.Where(dbuser.StatusEQ(filters.Status))
